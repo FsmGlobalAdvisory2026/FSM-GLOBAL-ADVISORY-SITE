@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="FSM Global Advisory — Financial Structuring & Capital Solutions. Master Broker especializado en financiamiento no bancario para PyMEs en México." />
+  <title>FSM Global Advisory — Financial Structuring & Capital Solutions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--gold:#c4a15c;--gold2:#a8843e;--dark:#090e1c;--text:#e8dfc8}
+    html{scroll-behavior:smooth}
+    body{background:var(--dark);color:var(--text);font-family:'Cormorant Garamond',Georgia,serif;overflow-x:hidden}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:rgba(196,161,92,.4);border-radius:3px}
+    nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(9,14,28,.93);backdrop-filter:blur(16px);border-bottom:1px solid rgba(196,161,92,.1);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between}
+    .nb{display:flex;align-items:center;gap:10px;cursor:pointer}
+    .ni{width:30px;height:30px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;font-size:13px;color:#080d1a}
+    .nn{font-family:'Montserrat',sans-serif;font-weight:600;font-size:12px;line-height:1}
+    .ns{font-family:'Montserrat',sans-serif;font-size:8px;color:var(--gold);letter-spacing:.15em;text-transform:uppercase}
+    .nl{display:flex;gap:22px;align-items:center}
+    .nlk{font-family:'Montserrat',sans-serif;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(232,223,200,.6);cursor:pointer;transition:color .2s}
+    .nlk:hover{color:var(--gold)}
+    .bg{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080d1a;border:none;padding:13px 28px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;border-radius:8px;cursor:pointer;transition:all .2s;display:inline-block}
+    .bg:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(196,161,92,.3);opacity:.92}
+    .bo{background:transparent;color:var(--gold);border:1px solid rgba(196,161,92,.45);padding:12px 26px;font-family:'Montserrat',sans-serif;font-weight:500;font-size:12px;letter-spacing:.1em;text-transform:uppercase;border-radius:8px;cursor:pointer;transition:all .2s;display:inline-block}
+    .bo:hover{background:rgba(196,161,92,.08);transform:translateY(-1px)}
+    .badge{display:inline-block;padding:5px 14px;background:rgba(196,161,92,.1);border:1px solid rgba(196,161,92,.25);border-radius:20px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+    .dv{height:1px;background:linear-gradient(to right,transparent,rgba(196,161,92,.2),transparent)}
+    section{padding:100px 32px}
+    .ct{max-width:1200px;margin:0 auto}
+    .sh{text-align:center;margin-bottom:64px}
+    .st{font-size:clamp(32px,5vw,54px);font-weight:300;margin-bottom:20px;line-height:1.1}
+    .ss{color:rgba(232,223,200,.55);font-family:'Montserrat',sans-serif;font-size:15px;font-weight:300;line-height:1.8;max-width:640px;margin:0 auto}
+    #hero{min-height:100vh;padding-top:64px;display:flex;align-items:center;position:relative;overflow:hidden}
+    .hbg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 60% 40%,rgba(196,161,92,.06) 0%,transparent 70%);pointer-events:none}
+    .hc1{position:absolute;top:15%;right:8%;width:400px;height:400px;border:1px solid rgba(196,161,92,.06);border-radius:50%;animation:float 8s ease-in-out infinite;pointer-events:none}
+    .hc2{position:absolute;top:25%;right:12%;width:260px;height:260px;border:1px solid rgba(196,161,92,.08);border-radius:50%;animation:float 6s ease-in-out 1s infinite;pointer-events:none}
+    .ht{font-size:clamp(44px,7vw,80px);font-weight:300;line-height:1.05;margin-bottom:24px}
+    .ht em{color:var(--gold);font-style:italic}
+    .hs{font-size:17px;color:rgba(232,223,200,.6);font-family:'Montserrat',sans-serif;font-weight:300;line-height:1.8;max-width:520px;margin-bottom:40px}
+    .hb{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:72px}
+    .sg{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(196,161,92,.1);border-radius:16px;overflow:hidden;border:1px solid rgba(196,161,92,.12)}
+    .si{text-align:center;padding:24px 16px;background:var(--dark)}
+    .sn{font-size:clamp(22px,3vw,32px);font-weight:500;color:var(--gold);margin-bottom:4px}
+    .sl{font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(232,223,200,.45);letter-spacing:.08em;text-transform:uppercase}
+    .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
+    .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+    .sc{background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.12);border-radius:16px;padding:26px;transition:all .25s;cursor:pointer}
+    .sc:hover{transform:translateY(-3px);border-color:rgba(196,161,92,.35);background:rgba(196,161,92,.04)}
+    .sc.on{border-color:rgba(196,161,92,.5)!important;background:rgba(196,161,92,.05)!important}
+    .sch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+    .tag{display:inline-block;padding:2px 9px;border-radius:4px;font-family:'Montserrat',sans-serif;font-size:9px;font-weight:600;letter-spacing:.05em}
+    .st2{font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px;margin-bottom:4px}
+    .st3{font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px;margin-bottom:4px}
+    .sub{font-family:'Montserrat',sans-serif;font-size:11px;color:var(--gold);margin-bottom:12px}
+    .sd{font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.6);line-height:1.7}
+    .sd2{font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.6);line-height:1.7}
+    .sf{border-top:1px solid rgba(196,161,92,.15);padding-top:14px;margin-top:14px;display:none}
+    .sc.on .sf{display:block}
+    .sfl{font-family:'Montserrat',sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+    .sfr{display:flex;gap:8px;margin-bottom:7px;align-items:flex-start}
+    .dot{width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:6px}
+    .sft{font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.8);line-height:1.6}
+    #reporte{background:rgba(196,161,92,.02)}
+    .rg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px}
+    .rc{background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.12);border-radius:14px;padding:24px}
+    .ri{font-size:26px;margin-bottom:10px}
+    .rt{font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px;margin-bottom:6px}
+    .rd{font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.5);line-height:1.7}
+    .rb{text-align:center;background:rgba(255,255,255,.02);border:1px solid rgba(196,161,92,.2);border-radius:20px;padding:52px}
+    .rpre{font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.4);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+    .rp{font-size:clamp(48px,6vw,72px);font-weight:300;color:var(--gold);line-height:1;margin-bottom:8px}
+    .rs{font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.4);margin-bottom:36px}
+    .rpow{margin-top:16px;font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.3)}
+    .bg2{display:grid;grid-template-columns:1fr 2fr;gap:48px;margin-bottom:64px}
+    .bp{background:linear-gradient(135deg,rgba(196,161,92,.08),rgba(196,161,92,.03));border:1px solid rgba(196,161,92,.25);border-radius:20px;padding:40px 32px;text-align:center;position:sticky;top:84px;align-self:start}
+    .bml{font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.4);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+    .bpr{font-size:52px;font-weight:300;color:var(--gold);line-height:1}
+    .bm{font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.5);margin-bottom:24px}
+    .bdv{height:1px;background:rgba(196,161,92,.15);margin-bottom:24px}
+    .bpr2{font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.6);line-height:1.7;margin-bottom:32px}
+    .bb{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .bc{background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.1);border-radius:14px;padding:22px}
+    .bi{font-size:22px;margin-bottom:10px}
+    .bt{font-family:'Montserrat',sans-serif;font-weight:600;font-size:12px;margin-bottom:6px}
+    .bd{font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.5);line-height:1.7}
+    .pl{font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:32px;text-align:center}
+    .pg{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;position:relative}
+    .pline{position:absolute;top:28px;left:12.5%;right:12.5%;height:1px;background:linear-gradient(to right,transparent,rgba(196,161,92,.2),rgba(196,161,92,.2),transparent);z-index:0}
+    .paso{text-align:center;position:relative;z-index:1}
+    .pn{width:56px;height:56px;border-radius:50%;background:var(--dark);border:1px solid rgba(196,161,92,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;color:var(--gold)}
+    .pt{font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px;margin-bottom:6px}
+    .pd{font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.5);line-height:1.6}
+    #nosotros{background:rgba(196,161,92,.02)}
+    .ng{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-bottom:80px}
+    .nt{font-size:clamp(36px,5vw,58px);font-weight:300;line-height:1.1;margin-bottom:28px}
+    .nt em{color:var(--gold);font-style:italic}
+    .np{font-family:'Montserrat',sans-serif;font-size:14px;color:rgba(232,223,200,.7);line-height:1.9;margin-bottom:16px}
+    .nn2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .nc{background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.12);border-radius:16px;padding:32px 24px;text-align:center}
+    .ncn{font-size:clamp(28px,3.5vw,44px);font-weight:400;color:var(--gold);margin-bottom:6px}
+    .ncl{font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.5);letter-spacing:.06em}
+    .vl{font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:24px;text-align:center}
+    .vg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .vc{background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.12);border-radius:16px;padding:32px 28px}
+    .vi{font-size:26px;margin-bottom:12px}
+    .vt{font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px;margin-bottom:10px}
+    .vd{font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.55);line-height:1.7}
+    .cb{background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.15);border-radius:24px;padding:48px;max-width:860px;margin:0 auto}
+    .cg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+    .fl{font-family:'Montserrat',sans-serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:6px}
+    .fi{background:rgba(255,255,255,.04);border:1px solid rgba(196,161,92,.2);border-radius:8px;color:var(--text);padding:11px 14px;font-size:14px;width:100%;font-family:'Montserrat',sans-serif;transition:border-color .2s;outline:none}
+    .fi:focus{border-color:rgba(196,161,92,.6);box-shadow:0 0 0 3px rgba(196,161,92,.07)}
+    .fi::placeholder{color:rgba(232,223,200,.25)}
+    .cok{text-align:center;padding:60px;background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.2);border-radius:24px;max-width:860px;margin:0 auto;display:none}
+    footer{border-top:1px solid rgba(196,161,92,.1);padding:48px 32px;background:rgba(0,0,0,.3)}
+    .fg{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px}
+    .fb{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:var(--gold);margin-bottom:4px}
+    .ft{font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(232,223,200,.35);letter-spacing:.15em;text-transform:uppercase}
+    .fc{text-align:center}
+    .fci{width:36px;height:36px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;font-size:15px;color:#080d1a;margin:0 auto 6px}
+    .fp{font-family:'Montserrat',sans-serif;font-size:9px;color:rgba(232,223,200,.2);letter-spacing:.12em;text-transform:uppercase}
+    .fr{text-align:right;font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.3)}
+    .mo{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
+    .mo.show{opacity:1;pointer-events:all}
+    .md{background:#0d1425;border:1px solid rgba(196,161,92,.3);border-radius:20px;padding:40px;max-width:520px;width:100%;position:relative;transform:translateY(20px);transition:transform .3s}
+    .mo.show .md{transform:translateY(0)}
+    .mc{position:absolute;top:16px;right:16px;background:transparent;border:none;color:rgba(232,223,200,.5);cursor:pointer;font-size:20px}
+    .mt2{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--gold);margin-bottom:4px;text-align:center}
+    .ms{font-family:'Montserrat',sans-serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(232,223,200,.4);text-align:center;margin-bottom:28px}
+    .mi{background:rgba(196,161,92,.08);border:1px solid rgba(196,161,92,.2);border-radius:12px;padding:20px;margin-bottom:24px;font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.7);line-height:1.7}
+    .mf{display:flex;gap:10px;align-items:center;margin-bottom:8px;font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.75)}
+    .mft{display:flex;justify-content:space-between;align-items:center;padding-top:16px;border-top:1px solid rgba(196,161,92,.12)}
+    .mpl{font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(232,223,200,.4);text-transform:uppercase;letter-spacing:.1em}
+    .mpr{font-size:32px;font-weight:300;color:var(--gold)}
+    .fade{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+    .fade.vis{opacity:1;transform:translateY(0)}
+    .a1{animation:fiu .9s ease forwards}
+    .a2{animation:fiu .9s ease .2s both}
+    .a3{animation:fiu .9s ease .4s both}
+    .a4{animation:fiu .9s ease .6s both}
+    .pulse{animation:pg 3s ease infinite}
+
+    /* WHATSAPP FLOAT */
+    .wa-btn{position:fixed;bottom:28px;right:28px;z-index:500;width:58px;height:58px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.4);cursor:pointer;transition:all .2s;text-decoration:none}
+    .wa-btn:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(37,211,102,.5)}
+    .wa-btn svg{width:30px;height:30px;fill:white}
+    .wa-tooltip{position:absolute;right:68px;background:rgba(9,14,28,.95);color:#e8dfc8;font-family:'Montserrat',sans-serif;font-size:12px;white-space:nowrap;padding:8px 14px;border-radius:8px;border:1px solid rgba(196,161,92,.2);opacity:0;transition:opacity .2s;pointer-events:none}
+    .wa-btn:hover .wa-tooltip{opacity:1}
+    /* PHONE BAR */
+    .phone-bar{background:rgba(196,161,92,.08);border-top:1px solid rgba(196,161,92,.15);border-bottom:1px solid rgba(196,161,92,.15);padding:10px 32px;display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap}
+    .phone-item{display:flex;align-items:center;gap:8px;font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.7)}
+    .phone-item a{color:var(--gold);text-decoration:none;font-weight:600;transition:opacity .2s}
+    .phone-item a:hover{opacity:.8}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    @keyframes fiu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes pg{0%,100%{box-shadow:0 0 0 0 rgba(196,161,92,.3)}50%{box-shadow:0 0 0 12px rgba(196,161,92,0)}}
+  </style>
+</head>
+<body>
+
+<div class="mo" id="modal">
+  <div class="md">
+    <button class="mc" onclick="closeModal()">✕</button>
+    <div class="mt2">FinBroker MX</div>
+    <div class="ms">Reporte de Diagnóstico PyME</div>
+    <div class="mi">Completa el formulario de 6 pasos para recibir tu diagnóstico financiero institucional completo — con Score FSM, análisis de facturación, flujos bancarios, estados financieros y el argumento más sólido para presentarte ante cualquier financiera.</div>
+    <div class="mf">🧾 Análisis de 24 meses de facturación SAT</div>
+    <div class="mf">🏦 Revisión de 12 estados de cuenta bancarios</div>
+    <div class="mf">📊 Relaciones analíticas y capacidad de pago real</div>
+    <div class="mf">🎯 Argumento FSM para maximizar tu aprobación</div>
+    <div class="mft">
+      <div><div class="mpl">Precio</div><div class="mpr">$299 <span style="font-size:14px">MXN</span></div></div>
+      <a href="reporte.html" class="bg pulse">Iniciar Diagnóstico →</a>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <div class="nb" onclick="goTo('hero')">
+    <div class="ni">F</div>
+    <div><div class="nn">FSM Global Advisory</div><div class="ns">Financial Structuring & Capital Solutions</div></div>
+  </div>
+  <div class="nl">
+    <span class="nlk" onclick="goTo('servicios')">Servicios</span>
+    <span class="nlk" onclick="goTo('reporte')">Reporte PyME</span>
+    <span class="nlk" onclick="goTo('brokers')">Brokers</span>
+    <span class="nlk" onclick="goTo('nosotros')">Nosotros</span>
+    <span class="nlk" onclick="goTo('contacto')">Contacto</span>
+  </div>
+</nav>
+
+<section id="hero">
+  <div class="hbg"></div><div class="hc1"></div><div class="hc2"></div>
+  <div class="ct">
+    <div style="max-width:680px">
+      <div class="badge a1">Master Broker · México</div>
+      <h1 class="ht a2">Financiamiento empresarial<br><em>sin límites.</em></h1>
+      <p class="hs a3">Conectamos PyMEs con las mejores opciones de crédito del mercado no bancario mexicano — con tecnología, experiencia y resultados comprobados.</p>
+      <div class="hb a4">
+        <button class="bg pulse" onclick="openModal()">Generar Reporte PyME</button>
+        <button class="bo" onclick="goTo('servicios')">Conocer Servicios</button>
+      </div>
+      <div class="sg a4">
+        <div class="si"><div class="sn">+850M</div><div class="sl">MDP colocados</div></div>
+        <div class="si"><div class="sn">45</div><div class="sl">Alianzas financieras</div></div>
+        <div class="si"><div class="sn">6+</div><div class="sl">Años de experiencia</div></div>
+        <div class="si"><div class="sn">7</div><div class="sl">Productos financieros</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="dv"></div>
+
+<section id="servicios">
+  <div class="ct">
+    <div class="sh fade">
+      <div class="badge">Portafolio Financiero</div>
+      <h2 class="st">Una solución para cada necesidad</h2>
+      <p class="ss">No existe una solución única para todas las empresas. Por eso contamos con 7 productos financieros distintos. <strong style="color:var(--gold)">Haz clic en cualquier producto para ver sus características.</strong></p>
+    </div>
+    <div class="g3 fade">
+      <div class="sc" onclick="tgl(this)">
+        <div class="sch"><span style="font-size:28px">📄</span><span class="tag" style="background:rgba(74,222,128,.12);color:#4ade80;border:1px solid rgba(74,222,128,.3)">Alta demanda</span></div>
+        <div class="st2">Factoraje Financiero</div><div class="sub">Cuentas por cobrar y pago a proveedores</div>
+        <p class="sd">¿Tienes facturas pendientes? Las convertimos en liquidez inmediata. Accede hasta el 90% de su valor sin esperar a que tus clientes te paguen.</p>
+        <div class="sf"><div class="sfl">Características generales</div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Hasta el 90% del valor de tus facturas en liquidez inmediata</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Plazos de 15 a 150 días para pagar</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Tasas desde 1.5% mensual</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Líneas de financiamiento de hasta $100 MDP</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Cobranza delegada o directa — tú decides</span></div>
+          <button class="bg" style="margin-top:16px;width:100%;padding:11px;font-size:11px" onclick="event.stopPropagation();goTo('contacto')">Solicitar información</button>
+        </div>
+      </div>
+      <div class="sc" onclick="tgl(this)">
+        <div class="sch"><span style="font-size:28px">🔄</span><span class="tag" style="background:rgba(196,161,92,.12);color:#c4a15c;border:1px solid rgba(196,161,92,.3)">Muy flexible</span></div>
+        <div class="st2">Línea Revolvente</div><div class="sub">Crédito que se recarga cada vez que pagas</div>
+        <p class="sd">Para empresas que necesitan apalancarse varias veces al año sin volver a tramitar desde cero. Pagas y la línea se regenera.</p>
+        <div class="sf"><div class="sfl">Características generales</div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Montos de hasta $50 MDP</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Plazos de hasta 60 meses</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Comisiones por apertura menores al 3.5%</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Con o sin garantía hipotecaria</span></div>
+          <button class="bg" style="margin-top:16px;width:100%;padding:11px;font-size:11px" onclick="event.stopPropagation();goTo('contacto')">Solicitar información</button>
+        </div>
+      </div>
+      <div class="sc" onclick="tgl(this)">
+        <div class="sch"><span style="font-size:28px">💼</span><span class="tag" style="background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3)">Más solicitado</span></div>
+        <div class="st2">Crédito Simple</div><div class="sub">La línea tradicional, sin sorpresas</div>
+        <p class="sd">Sabes exactamente cuánto vas a pagar desde el día uno. Ideal para certeza financiera total o para construir tu primer historial crediticio.</p>
+        <div class="sf"><div class="sfl">Características generales</div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Montos de hasta $300 MDP</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Tasas menores al 35% anual</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Plazos de 6 a 72 meses</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Garantía hipotecaria en montos superiores a $10 MDP</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Combinación de múltiples financieras para ampliar el monto</span></div>
+          <button class="bg" style="margin-top:16px;width:100%;padding:11px;font-size:11px" onclick="event.stopPropagation();goTo('contacto')">Solicitar información</button>
+        </div>
+      </div>
+    </div>
+    <div class="g4 fade">
+      <div class="sc" onclick="tgl(this)">
+        <div class="sch"><span style="font-size:24px">🏭</span><span class="tag" style="background:rgba(74,222,128,.12);color:#4ade80;border:1px solid rgba(74,222,128,.3)">Fiscal</span></div>
+        <div class="st3">Arrendamiento</div><div class="sub">Puro o financiero</div>
+        <p class="sd2">Adquiere activos productivos mientras optimizas tu carga fiscal. Mensualidades 100% deducibles.</p>
+        <div class="sf"><div class="sfl">Características</div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Enganche desde el 10%</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Plazos de hasta 60 meses</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Mensualidades 100% deducibles</span></div>
+          <button class="bg" style="margin-top:14px;width:100%;padding:10px;font-size:11px" onclick="event.stopPropagation();goTo('contacto')">Solicitar</button>
+        </div>
+      </div>
+      <div class="sc" onclick="tgl(this)">
+        <div class="sch"><span style="font-size:24px">🔃</span><span class="tag" style="background:rgba(249,115,22,.12);color:#f97316;border:1px solid rgba(249,115,22,.3)">Inteligente</span></div>
+        <div class="st3">Sale & Leaseback</div><div class="sub">Capitalízate sin perder activos</div>
+        <p class="sd2">Convierte tus activos en liquidez sin deshacerte de ellos. Al final del plazo los recuperas.</p>
+        <div class="sf"><div class="sfl">Características</div>
+          <div class="sfr"><div class="dot"></div><span class="sft">30% al 100% del valor factura</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Activos con antigüedad menor a 6 años</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Montos de hasta $35 MDP</span></div>
+          <button class="bg" style="margin-top:14px;width:100%;padding:10px;font-size:11px" onclick="event.stopPropagation();goTo('contacto')">Solicitar</button>
+        </div>
+      </div>
+      <div class="sc" onclick="tgl(this)">
+        <div class="sch"><span style="font-size:24px">💳</span><span class="tag" style="background:rgba(74,222,128,.12);color:#4ade80;border:1px solid rgba(74,222,128,.3)">Sin SAT</span></div>
+        <div class="st3">Anticipo por TPV</div><div class="sub">Terminal como crédito</div>
+        <p class="sd2">Si generas más de $150K/mes por terminal, accede a financiamiento sin facturar ante el SAT.</p>
+        <div class="sf"><div class="sfl">Características</div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Adelanto de hasta 2 meses de ventas</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">No requiere facturación SAT</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Repago del 10% al 25% de ventas diarias</span></div>
+          <button class="bg" style="margin-top:14px;width:100%;padding:10px;font-size:11px" onclick="event.stopPropagation();goTo('contacto')">Solicitar</button>
+        </div>
+      </div>
+      <div class="sc" onclick="tgl(this)">
+        <div class="sch"><span style="font-size:24px">🏗️</span><span class="tag" style="background:rgba(196,161,92,.12);color:#c4a15c;border:1px solid rgba(196,161,92,.3)">Inmobiliario</span></div>
+        <div class="st3">Crédito Puente</div><div class="sub">Para desarrolladores</div>
+        <p class="sd2">Disposiciones escalonadas según avance de obra. Financia proyectos sin comprometer tu flujo.</p>
+        <div class="sf"><div class="sfl">Características</div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Montos de hasta $100 MDP</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Disposiciones al inicio, 20%, 50% y 80%</span></div>
+          <div class="sfr"><div class="dot"></div><span class="sft">Ideal para constructoras y desarrolladores</span></div>
+          <button class="bg" style="margin-top:14px;width:100%;padding:10px;font-size:11px" onclick="event.stopPropagation();goTo('contacto')">Solicitar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="dv"></div>
+
+<section id="reporte">
+  <div class="ct">
+    <div class="sh fade">
+      <div class="badge">Producto Estrella · FinBroker MX</div>
+      <h2 class="st">Diagnóstico Financiero Institucional</h2>
+      <p class="ss">Antes de buscar financiamiento, necesitas saber exactamente cómo te ve una institución financiera. Nuestro reporte te da ese mapa completo — con números reales y el argumento más sólido para presentarte ante cualquier financiera del portafolio FSM.</p>
+    </div>
+    <div class="rg fade">
+      <div class="rc"><div class="ri">🧾</div><div class="rt">Facturación SAT</div><div class="rd">24 meses de análisis continuo, tendencias y riesgo de concentración en clientes</div></div>
+      <div class="rc"><div class="ri">🏦</div><div class="rt">Flujos Bancarios</div><div class="rd">12 estados de cuenta para determinar tu ingreso real depurado vs. el declarado</div></div>
+      <div class="rc"><div class="ri">📊</div><div class="rt">Relaciones Analíticas</div><div class="rd">Razones de liquidez, endeudamiento y capacidad de pago real con tus números</div></div>
+      <div class="rc"><div class="ri">📋</div><div class="rt">Historial Crediticio</div><div class="rd">Análisis de Buró de Crédito y comportamiento financiero histórico</div></div>
+      <div class="rc"><div class="ri">🔒</div><div class="rt">Garantías</div><div class="rd">Evaluación de colateral disponible y cobertura vs. monto solicitado</div></div>
+      <div class="rc"><div class="ri">🎯</div><div class="rt">Argumento FSM</div><div class="rd">El punto más sólido de tu perfil para maximizar las probabilidades de aprobación</div></div>
+    </div>
+    <div class="rb fade">
+      <div class="rpre">desde</div>
+      <div class="rp">$299 MXN</div>
+      <div class="rs">por reporte · resultado en minutos</div>
+      <button class="bg pulse" style="font-size:13px;padding:16px 52px" onclick="openModal()">Generar mi Reporte ahora →</button>
+      <div class="rpow">Powered by FinBroker MX · Análisis con Inteligencia Artificial</div>
+    </div>
+  </div>
+</section>
+
+<div class="dv"></div>
+
+<section id="brokers">
+  <div class="ct">
+    <div class="sh fade">
+      <div class="badge">Programa de Afiliación</div>
+      <h2 class="st">Crece con FSM Global Advisory</h2>
+      <p class="ss">Únete a nuestra red de brokers y accede a las herramientas, capacitación y comisiones que necesitas para llevar tu cartera al siguiente nivel.</p>
+    </div>
+    <div class="bg2 fade">
+      <div class="bp">
+        <div class="bml">Membresía</div>
+        <div class="bpr">$300</div>
+        <div class="bm">MXN / mes</div>
+        <div class="bdv"></div>
+        <div class="bpr2">Todo lo que necesitas para operar profesionalmente</div>
+        <button class="bg" style="width:100%" onclick="goTo('contacto')">Quiero afiliarme</button>
+      </div>
+      <div class="bb">
+        <div class="bc"><div class="bi">📊</div><div class="bt">5 Reportes FSM al mes</div><div class="bd">Diagnostica a tus clientes con análisis institucional real antes de presentarlos</div></div>
+        <div class="bc"><div class="bi">💰</div><div class="bt">Comisiones preferenciales</div><div class="bd">Porcentajes superiores al estándar del mercado para brokers afiliados</div></div>
+        <div class="bc"><div class="bi">📚</div><div class="bt">Biblioteca de capacitaciones</div><div class="bd">Videos y materiales actualizados por financiera — productos, requisitos y cambios</div></div>
+        <div class="bc"><div class="bi">📋</div><div class="bt">Checklists y formatos</div><div class="bd">Toda la documentación necesaria por producto y financiera en un solo lugar</div></div>
+        <div class="bc"><div class="bi">📈</div><div class="bt">Tabulador de comisiones</div><div class="bd">Consulta en tiempo real las comisiones por producto, plazo y financiera</div></div>
+        <div class="bc"><div class="bi">🚀</div><div class="bt">Plataforma FinBroker MX</div><div class="bd">Sube clientes, da seguimiento y gestiona tu cartera desde un solo lugar</div></div>
+      </div>
+    </div>
+    <div class="fade">
+      <div class="pl">¿Cómo funciona?</div>
+      <div class="pg">
+        <div class="pline"></div>
+        <div class="paso"><div class="pn">01</div><div class="pt">Regístrate</div><div class="pd">Activa tu membresía por $300/mes y accede a toda la plataforma</div></div>
+        <div class="paso"><div class="pn">02</div><div class="pt">Capacítate</div><div class="pd">Conoce el portafolio completo de FSM y las financieras aliadas</div></div>
+        <div class="paso"><div class="pn">03</div><div class="pt">Sube clientes</div><div class="pd">Captura y califica a tus prospectos con FinBroker MX</div></div>
+        <div class="paso"><div class="pn">04</div><div class="pt">Cobra comisiones</div><div class="pd">FSM gestiona la colocación — tú recibes tu comisión al cierre</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="dv"></div>
+
+<section id="nosotros">
+  <div class="ct">
+    <div class="ng fade">
+      <div>
+        <div class="badge">Nuestra Historia</div>
+        <h2 class="nt"><em>Beyond the Limits</em></h2>
+        <p class="np">Con más de 6 años en el sector financiero no bancario mexicano, hemos construido una red de 45 alianzas directas con las principales financieras, fondos de deuda y fintechs del país.</p>
+        <p class="np">No somos un intermediario más. Somos el puente estratégico entre la realidad financiera de las PyMEs mexicanas y las oportunidades reales que el mercado alternativo tiene para ofrecerles.</p>
+      </div>
+      <div class="nn2">
+        <div class="nc"><div class="ncn">+850M</div><div class="ncl">MDP colocados</div></div>
+        <div class="nc"><div class="ncn">45</div><div class="ncl">Alianzas directas</div></div>
+        <div class="nc"><div class="ncn">6+</div><div class="ncl">Años de experiencia</div></div>
+        <div class="nc"><div class="ncn">7</div><div class="ncl">Productos financieros</div></div>
+      </div>
+    </div>
+    <div class="fade">
+      <div class="vl">Nuestros Pilares</div>
+      <div class="vg">
+        <div class="vc"><div class="vi">⚡</div><div class="vt">Tecnología</div><div class="vd">FinBroker MX — nuestra plataforma propia de análisis crediticio y gestión de expedientes</div></div>
+        <div class="vc"><div class="vi">🤝</div><div class="vt">Transparencia</div><div class="vd">Sin letras chicas. Comisiones claras, procesos documentados y resultados medibles</div></div>
+        <div class="vc"><div class="vi">🎯</div><div class="vt">Especialización</div><div class="vd">100% PyMEs. 100% no bancario. Conocemos cada producto y cada financiera del portafolio</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="dv"></div>
+
+<section id="contacto">
+  <div class="ct">
+    <div class="sh fade">
+      <div class="badge">Hablemos</div>
+      <h2 class="st">¿Listo para el siguiente nivel?</h2>
+      <p class="ss">Ya sea que busques financiamiento, quieras tu reporte de diagnóstico o quieras crecer como broker — estamos aquí para acompañarte.</p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:24px;margin-bottom:0">
+        <a href="tel:+529611717870" class="btn-o" style="display:flex;align-items:center;gap:8px;text-decoration:none">📞 +52 961 171 7870</a>
+        <a href="https://wa.me/529611717870" target="_blank" class="btn-g" style="display:flex;align-items:center;gap:8px;text-decoration:none">💬 Escribir por WhatsApp</a>
+      </div>
+    </div>
+    <div class="cb fade" id="cform">
+      <div class="cg">
+        <div><label class="fl">Nombre completo</label><input class="fi" type="text" id="nombre" /></div>
+        <div><label class="fl">Empresa</label><input class="fi" type="text" id="empresa" /></div>
+        <div><label class="fl">Teléfono</label><input class="fi" type="tel" id="telefono" /></div>
+        <div><label class="fl">Correo electrónico</label><input class="fi" type="email" id="email" /></div>
+      </div>
+      <div style="margin-bottom:16px"><label class="fl">Soy...</label>
+        <select class="fi" id="tipo">
+          <option value="">Seleccionar...</option>
+          <option value="pyme">PyME — Busco financiamiento</option>
+          <option value="broker">Broker — Quiero afiliarme</option>
+          <option value="financiera">Financiera — Busco alianza</option>
+        </select>
+      </div>
+      <div style="margin-bottom:32px"><label class="fl">¿En qué podemos ayudarte?</label><textarea class="fi" id="mensaje" rows="4" style="resize:vertical"></textarea></div>
+      <div style="text-align:center"><button class="bg" style="padding:15px 48px" onclick="enviar()">Enviar mensaje</button></div>
+    </div>
+    <div class="cok" id="cok">
+      <div style="font-size:48px;margin-bottom:20px">✅</div>
+      <div style="font-family:'Montserrat',sans-serif;font-size:16px;color:#4ade80;font-weight:500">¡Mensaje recibido! Te contactamos en menos de 24 horas.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="ct">
+    <div class="fg">
+      <div><div class="fb">FSM Global Advisory</div><div class="ft">Financial Structuring & Capital Solutions</div></div>
+      <div class="fc"><div class="fci">F</div><div class="fp">Powered by FinBroker MX Technology</div></div>
+      <div class="fr">© 2025 FSM Global Advisory. Todos los derechos reservados.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function goTo(id){document.getElementById(id).scrollIntoView({behavior:'smooth'});}
+  function openModal(){document.getElementById('modal').classList.add('show');}
+  function closeModal(){document.getElementById('modal').classList.remove('show');}
+  document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+  function tgl(c){var a=c.classList.contains('on');document.querySelectorAll('.sc').forEach(function(x){x.classList.remove('on');});if(!a)c.classList.add('on');}
+  function enviar(){
+    var n=document.getElementById('nombre').value;
+    var e=document.getElementById('email').value;
+    var t=document.getElementById('tipo').value;
+    if(!n||!e||!t){alert('Por favor completa: Nombre, Correo y tipo de contacto.');return;}
+    document.getElementById('cform').style.display='none';
+    document.getElementById('cok').style.display='block';
+  }
+  var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('vis');});},{threshold:.1});
+  document.querySelectorAll('.fade').forEach(function(el){obs.observe(el);});
+</script>
+
+  <!-- WHATSAPP FLOAT -->
+  <a href="https://wa.me/529611717870" target="_blank" class="wa-btn">
+    <div class="wa-tooltip">¡Escríbenos por WhatsApp!</div>
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  </a>
+
+</body>
+</html>

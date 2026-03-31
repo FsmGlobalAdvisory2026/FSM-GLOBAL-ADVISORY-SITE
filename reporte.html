@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinBroker MX — Reporte de Diagnóstico PyME | FSM Global Advisory</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--gold:#c4a15c;--gold2:#a8843e;--dark:#090e1c;--text:#e8dfc8}
+    html{scroll-behavior:smooth}
+    body{background:var(--dark);color:var(--text);font-family:'Cormorant Garamond',Georgia,serif;min-height:100vh}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:rgba(196,161,92,.4);border-radius:3px}
+    nav{position:sticky;top:0;z-index:100;background:rgba(9,14,28,.93);backdrop-filter:blur(16px);border-bottom:1px solid rgba(196,161,92,.1);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between}
+    .nb{display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none;color:inherit}
+    .ni{width:30px;height:30px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;font-size:13px;color:#080d1a}
+    .nn{font-family:'Montserrat',sans-serif;font-weight:600;font-size:12px;line-height:1}
+    .ns{font-family:'Montserrat',sans-serif;font-size:8px;color:var(--gold);letter-spacing:.15em;text-transform:uppercase}
+    .ntag{font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(232,223,200,.5)}
+    .btn-g{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080d1a;border:none;padding:13px 28px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;border-radius:8px;cursor:pointer;transition:all .2s;display:inline-block}
+    .btn-g:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(196,161,92,.3);opacity:.92}
+    .btn-g:disabled{opacity:.35;cursor:not-allowed;transform:none}
+    .btn-o{background:transparent;color:var(--gold);border:1px solid rgba(196,161,92,.45);padding:11px 24px;font-family:'Montserrat',sans-serif;font-weight:500;font-size:12px;letter-spacing:.1em;text-transform:uppercase;border-radius:8px;cursor:pointer;transition:all .2s}
+    .btn-o:hover{background:rgba(196,161,92,.08)}
+    .badge{display:inline-block;padding:5px 14px;background:rgba(196,161,92,.1);border:1px solid rgba(196,161,92,.25);border-radius:20px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+    .wrap{max-width:760px;margin:0 auto;padding:48px 20px 80px}
+    /* STEPS */
+    .steps{display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap}
+    .step-dot{height:8px;border-radius:4px;transition:all .3s;background:rgba(196,161,92,.2)}
+    .step-dot.active{background:var(--gold);width:24px!important}
+    .step-dot.done{background:var(--gold)}
+    .step-label{text-align:center;font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(196,161,92,.7);letter-spacing:.15em;text-transform:uppercase;margin-bottom:32px}
+    /* CARD */
+    .card{background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.15);border-radius:16px;padding:28px;margin-bottom:16px}
+    .card-note{background:rgba(196,161,92,.08);border-left:3px solid var(--gold);border-radius:8px;padding:12px 16px;margin-bottom:20px;font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(232,223,200,.7);line-height:1.6}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+    .span2{grid-column:1/-1}
+    .lbl{font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:6px}
+    .inp{background:rgba(255,255,255,.04);border:1px solid rgba(196,161,92,.2);border-radius:8px;color:var(--text);padding:10px 14px;font-size:14px;width:100%;font-family:'Montserrat',sans-serif;transition:border-color .2s;outline:none}
+    .inp:focus{border-color:rgba(196,161,92,.6);box-shadow:0 0 0 3px rgba(196,161,92,.07)}
+    .inp::placeholder{color:rgba(232,223,200,.25)}
+    .nav-btns{display:flex;justify-content:space-between;margin-top:8px}
+    /* ANALYZING */
+    .analyzing{text-align:center;padding:60px 0}
+    .spin{width:64px;height:64px;border:3px solid rgba(196,161,92,.2);border-top:3px solid var(--gold);border-radius:50%;margin:0 auto 32px;animation:spin 1s linear infinite}
+    .spin-title{font-size:28px;font-weight:300;margin-bottom:12px}
+    .spin-sub{color:rgba(232,223,200,.5);font-family:'Montserrat',sans-serif;font-size:14px}
+    .spin-items{margin-top:32px;display:flex;flex-direction:column;gap:8px;max-width:300px;margin:32px auto 0}
+    .spin-item{display:flex;align-items:center;gap:10px;font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.6)}
+    .spin-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0}
+    /* REPORT */
+    .report-header{text-align:center;margin-bottom:32px;padding:32px;background:rgba(255,255,255,.02);border:1px solid rgba(196,161,92,.2);border-radius:20px}
+    .report-name{font-size:28px;font-weight:400;margin-bottom:4px}
+    .report-meta{color:rgba(232,223,200,.5);font-family:'Montserrat',sans-serif;font-size:12px}
+    .report-summary{color:rgba(232,223,200,.75);font-family:'Montserrat',sans-serif;font-size:13px;line-height:1.8;margin-top:16px;text-align:left}
+    .score-box{background:rgba(255,255,255,.03);border:1px solid rgba(196,161,92,.2);border-radius:16px;padding:28px;margin-bottom:16px;display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:center}
+    .score-ring{text-align:center}
+    .score-bars .bar-row{margin-bottom:8px}
+    .bar-label{display:flex;justify-content:space-between;margin-bottom:3px;font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.7);text-transform:capitalize}
+    .bar-track{height:4px;background:rgba(255,255,255,.06);border-radius:2px}
+    .bar-fill{height:4px;border-radius:2px;transition:width 1s ease}
+    .sec-card{border-radius:12px;padding:20px 24px;margin-bottom:12px;border:1px solid}
+    .sec-card.verde{background:rgba(74,222,128,.04);border-color:rgba(74,222,128,.2)}
+    .sec-card.amarillo{background:rgba(250,204,21,.04);border-color:rgba(250,204,21,.2)}
+    .sec-card.rojo{background:rgba(248,113,113,.04);border-color:rgba(248,113,113,.2)}
+    .sec-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+    .sec-title{font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px}
+    .semaforo-tag{display:inline-block;padding:3px 10px;border-radius:4px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;letter-spacing:.05em}
+    .sec-hallazgos{margin:0 0 10px 0;padding:0 0 0 16px;color:rgba(232,223,200,.75);font-family:'Montserrat',sans-serif;font-size:12px;line-height:1.9}
+    .sec-comentario{font-size:13px;color:rgba(232,223,200,.6);font-family:'Montserrat',sans-serif;line-height:1.7;font-style:italic;border-top:1px solid rgba(196,161,92,.1);padding-top:10px;margin:0}
+    .argumento{background:linear-gradient(135deg,rgba(196,161,92,.08),rgba(196,161,92,.03));border:1px solid rgba(196,161,92,.3);border-radius:16px;padding:28px;margin-bottom:12px}
+    .arg-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+    .arg-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+    .arg-title{font-family:'Montserrat',sans-serif;font-weight:600;font-size:15px}
+    .arg-sub{font-family:'Montserrat',sans-serif;font-size:11px;color:var(--gold)}
+    .arg-text{color:rgba(232,223,200,.85);font-family:'Montserrat',sans-serif;font-size:13px;line-height:1.9}
+    .prods-card{background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.12);border-radius:12px;padding:14px 18px;margin-bottom:10px}
+    .prod-name{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;margin-bottom:4px}
+    .prod-inst{font-family:'Montserrat',sans-serif;font-size:11px;color:var(--gold);margin-bottom:6px}
+    .prod-razon{font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.6)}
+    .prod-monto{font-family:'Montserrat',sans-serif;font-size:12px;color:#4ade80;font-weight:600;white-space:nowrap}
+    .recs-item{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+    .prior-tag{display:inline-block;padding:3px 10px;border-radius:4px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:.05em;flex-shrink:0}
+    .rec-accion{font-family:'Montserrat',sans-serif;font-size:13px;margin-bottom:3px}
+    .rec-impacto{font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.5)}
+    .broker-note{background:rgba(10,15,30,.6);border:1px solid rgba(196,161,92,.15);border-radius:12px;padding:20px 24px;margin-bottom:24px}
+    .broker-label{font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+    .broker-text{color:rgba(232,223,200,.7);font-family:'Montserrat',sans-serif;font-size:13px;line-height:1.8;margin:0;white-space:pre-line}
+    .footer-report{text-align:center;margin-top:32px;padding-top:24px;border-top:1px solid rgba(196,161,92,.1)}
+    .footer-brand{font-size:10px;color:rgba(196,161,92,.5);font-family:'Montserrat',sans-serif;letter-spacing:.15em;text-transform:uppercase}
+    .footer-pow{font-size:10px;color:rgba(232,223,200,.2);font-family:'Montserrat',sans-serif;margin-top:4px}
+    .sec-label{font-family:'Montserrat',sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp .5s ease forwards}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nb">
+    <div class="ni">F</div>
+    <div><div class="nn">FSM Global Advisory</div><div class="ns">FinBroker MX</div></div>
+  </a>
+  <span class="ntag">Reporte de Diagnóstico PyME</span>
+</nav>
+
+<div class="wrap" id="app">
+
+  <!-- INTRO -->
+  <div id="view-intro" class="fade-up">
+    <div style="text-align:center;margin-bottom:48px">
+      <div class="badge">Herramienta Exclusiva FSM</div>
+      <h1 style="font-size:clamp(32px,5vw,52px);font-weight:300;line-height:1.15;margin-bottom:20px">
+        Diagnóstico Financiero<br><em style="color:var(--gold);font-style:italic">Institucional PyME</em>
+      </h1>
+      <p style="color:rgba(232,223,200,.6);font-size:16px;font-family:'Montserrat',sans-serif;font-weight:300;line-height:1.7;max-width:520px;margin:0 auto 40px">
+        Análisis profundo de 6 dimensiones financieras para determinar la viabilidad crediticia de tu empresa desde una perspectiva institucional.
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:40px;text-align:left;max-width:560px;margin-left:auto;margin-right:auto">
+        <div style="background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.12);border-radius:12px;padding:16px"><div style="font-size:20px;margin-bottom:6px">🧾</div><div style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;margin-bottom:4px">Facturación SAT</div><div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.5)">24 meses de análisis</div></div>
+        <div style="background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.12);border-radius:12px;padding:16px"><div style="font-size:20px;margin-bottom:6px">🏦</div><div style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;margin-bottom:4px">Flujos Bancarios</div><div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.5)">Ingreso real depurado</div></div>
+        <div style="background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.12);border-radius:12px;padding:16px"><div style="font-size:20px;margin-bottom:6px">📊</div><div style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;margin-bottom:4px">Relaciones Analíticas</div><div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.5)">Capacidad de pago real</div></div>
+        <div style="background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.12);border-radius:12px;padding:16px"><div style="font-size:20px;margin-bottom:6px">📋</div><div style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;margin-bottom:4px">Historial Crediticio</div><div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.5)">Análisis de Buró</div></div>
+        <div style="background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.12);border-radius:12px;padding:16px"><div style="font-size:20px;margin-bottom:6px">🔒</div><div style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;margin-bottom:4px">Garantías</div><div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.5)">Cobertura y colateral</div></div>
+        <div style="background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.12);border-radius:12px;padding:16px"><div style="font-size:20px;margin-bottom:6px">🎯</div><div style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;margin-bottom:4px">Argumento FSM</div><div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.5)">Tu punto más fuerte</div></div>
+      </div>
+      <button class="btn-g" onclick="showStep(1)">Iniciar Diagnóstico →</button>
+    </div>
+  </div>
+
+  <!-- STEP 1: Datos Generales -->
+  <div id="view-step1" style="display:none">
+    <div class="steps" id="dots1"></div>
+    <div class="step-label">🏢 Paso 1 de 6 — Datos Generales</div>
+    <div class="card">
+      <div class="grid2">
+        <div class="span2"><label class="lbl">Razón Social *</label><input class="inp" id="s1_razon" placeholder="Ej. Grupo Industrial del Norte S.A. de C.V." /></div>
+        <div><label class="lbl">RFC *</label><input class="inp" id="s1_rfc" placeholder="GIN850101XYZ" /></div>
+        <div><label class="lbl">Estado de la República</label><input class="inp" id="s1_estado" placeholder="Ej. Chiapas" /></div>
+        <div><label class="lbl">Sector / Giro *</label>
+          <select class="inp" id="s1_sector">
+            <option value="">Seleccionar...</option>
+            <option>Comercio al por mayor</option><option>Comercio al por menor</option><option>Manufactura</option>
+            <option>Construcción</option><option>Transporte y logística</option><option>Servicios profesionales</option>
+            <option>Tecnología</option><option>Alimentos y bebidas</option><option>Agropecuario</option>
+            <option>Salud</option><option>Educación</option><option>Turismo y hospitalidad</option><option>Otro</option>
+          </select>
+        </div>
+        <div><label class="lbl">Régimen Fiscal *</label>
+          <select class="inp" id="s1_regimen">
+            <option value="">Seleccionar...</option>
+            <option>Régimen General de Ley (Persona Moral)</option>
+            <option>Régimen Simplificado de Confianza (RESICO PM)</option>
+            <option>Régimen de Actividades Empresariales (Persona Física)</option>
+            <option>RESICO Persona Física</option>
+            <option>Régimen de Incorporación Fiscal (RIF)</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div><label class="lbl">Años de Operación *</label><input class="inp" type="number" id="s1_anios" min="0" placeholder="Ej. 7" /></div>
+        <div><label class="lbl">Número de Empleados</label><input class="inp" type="number" id="s1_empleados" placeholder="Ej. 35" /></div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-o" onclick="showIntro()">← Atrás</button>
+      <button class="btn-g" onclick="next1()">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Facturación SAT -->
+  <div id="view-step2" style="display:none">
+    <div class="steps" id="dots2"></div>
+    <div class="step-label">🧾 Paso 2 de 6 — Facturación SAT</div>
+    <div class="card">
+      <div class="card-note">Ingresa los datos de facturación de los últimos 24 meses para analizar continuidad, tendencia y dependencia de ingresos.</div>
+      <div class="grid2">
+        <div><label class="lbl">Facturación Promedio Mensual (MXN) *</label><input class="inp" type="number" id="s2_promedio" placeholder="Ej. 850000" /></div>
+        <div><label class="lbl">Facturación Anual Total (MXN) *</label><input class="inp" type="number" id="s2_anual" placeholder="Ej. 10200000" /></div>
+        <div><label class="lbl">Mes con Facturación Mínima (MXN)</label><input class="inp" type="number" id="s2_min" placeholder="Ej. 300000" /></div>
+        <div><label class="lbl">Mes con Facturación Máxima (MXN)</label><input class="inp" type="number" id="s2_max" placeholder="Ej. 1500000" /></div>
+        <div><label class="lbl">Meses sin Facturar (últimos 24)</label><input class="inp" type="number" id="s2_meses_sin" min="0" max="24" placeholder="Ej. 2" /></div>
+        <div><label class="lbl">Tendencia de Facturación</label>
+          <select class="inp" id="s2_tendencia">
+            <option value="">Seleccionar...</option>
+            <option value="creciente">Creciente — Aumenta mes a mes</option>
+            <option value="estable">Estable — Se mantiene constante</option>
+            <option value="decreciente">Decreciente — Ha bajado</option>
+            <option value="irregular">Irregular — Muy variable</option>
+          </select>
+        </div>
+        <div><label class="lbl">% Ingresos de Gobierno</label><input class="inp" type="number" id="s2_gobierno" min="0" max="100" placeholder="Ej. 40" /></div>
+        <div><label class="lbl">% del Cliente Principal</label><input class="inp" type="number" id="s2_cliente_pct" min="0" max="100" placeholder="Ej. 35" /></div>
+        <div class="span2"><label class="lbl">Principales Clientes (nombre / giro)</label><textarea class="inp" id="s2_clientes" rows="3" style="resize:vertical" placeholder="Ej. Empresa ABC (manufactura) - 35%, Empresa XYZ (comercio) - 20%..."></textarea></div>
+        <div><label class="lbl">% del Proveedor Principal</label><input class="inp" type="number" id="s2_prov_pct" min="0" max="100" placeholder="Ej. 50" /></div>
+        <div class="span2"><label class="lbl">Principales Proveedores</label><textarea class="inp" id="s2_proveedores" rows="2" style="resize:vertical" placeholder="Ej. Proveedor ABC (materia prima) - 50%..."></textarea></div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-o" onclick="showStep(1)">← Atrás</button>
+      <button class="btn-g" onclick="next2()">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Flujos Bancarios -->
+  <div id="view-step3" style="display:none">
+    <div class="steps" id="dots3"></div>
+    <div class="step-label">🏦 Paso 3 de 6 — Flujos Bancarios</div>
+    <div class="card">
+      <div class="card-note">Basado en la revisión de los 12 estados de cuenta bancarios. Este análisis depura el ingreso real vs. el declarado.</div>
+      <div class="grid2">
+        <div><label class="lbl">Banco Principal</label><input class="inp" id="s3_banco" placeholder="Ej. BBVA, Banorte, HSBC..." /></div>
+        <div><label class="lbl">Número de Cuentas Bancarias</label><input class="inp" type="number" id="s3_cuentas" min="1" placeholder="Ej. 3" /></div>
+        <div><label class="lbl">Promedio Mensual Bancario Total (MXN) *</label><input class="inp" type="number" id="s3_promedio" placeholder="Ej. 920000" /></div>
+        <div><label class="lbl">Ingreso Real Estimado (sin traspasos) *</label><input class="inp" type="number" id="s3_real" placeholder="Ej. 780000" /></div>
+        <div><label class="lbl">Traspasos entre Cuentas Propias</label>
+          <select class="inp" id="s3_traspasos">
+            <option value="">Seleccionar...</option>
+            <option value="no">No se detectaron traspasos significativos</option>
+            <option value="bajos">Bajos — menos del 10%</option>
+            <option value="medios">Medios — entre 10% y 30%</option>
+            <option value="altos">Altos — más del 30%</option>
+          </select>
+        </div>
+        <div><label class="lbl">Ciclicidad de Ingresos</label>
+          <select class="inp" id="s3_ciclicidad">
+            <option value="">Seleccionar...</option>
+            <option value="constante">Constante — Ingresos todos los meses</option>
+            <option value="estacional">Estacional — Concentrado en ciertas épocas</option>
+            <option value="irregular">Irregular — Sin patrón claro</option>
+            <option value="picos">Con picos — Meses muy buenos y malos</option>
+          </select>
+        </div>
+        <div class="span2"><label class="lbl">Autenticidad de Estados de Cuenta</label>
+          <select class="inp" id="s3_autenticidad">
+            <option value="">Seleccionar...</option>
+            <option value="originales">Originales del banco verificados</option>
+            <option value="cfdi">Descargados directamente del portal bancario</option>
+            <option value="escaneados">Escaneados — pendiente verificación</option>
+            <option value="dudosa">Se detectaron inconsistencias</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-o" onclick="showStep(2)">← Atrás</button>
+      <button class="btn-g" onclick="next3()">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Estados Financieros -->
+  <div id="view-step4" style="display:none">
+    <div class="steps" id="dots4"></div>
+    <div class="step-label">📊 Paso 4 de 6 — Estados Financieros</div>
+    <div class="card">
+      <div class="card-note">Datos del Balance General y Estado de Resultados más reciente. Se calcularán razones analíticas y capacidad de pago real.</div>
+      <div class="grid2">
+        <div><label class="lbl">Total Activos (MXN) *</label><input class="inp" type="number" id="s4_activos" placeholder="Ej. 5000000" /></div>
+        <div><label class="lbl">Total Pasivos (MXN) *</label><input class="inp" type="number" id="s4_pasivos" placeholder="Ej. 2000000" /></div>
+        <div><label class="lbl">Activo Circulante (MXN)</label><input class="inp" type="number" id="s4_circulante" placeholder="Ej. 1800000" /></div>
+        <div><label class="lbl">Capital Contable (MXN)</label><input class="inp" type="number" id="s4_capital" placeholder="Ej. 3000000" /></div>
+        <div><label class="lbl">Pasivo Corto Plazo (MXN)</label><input class="inp" type="number" id="s4_pasivo_cp" placeholder="Ej. 800000" /></div>
+        <div><label class="lbl">Pasivo Largo Plazo (MXN)</label><input class="inp" type="number" id="s4_pasivo_lp" placeholder="Ej. 1200000" /></div>
+        <div><label class="lbl">Utilidad Neta Anual (MXN)</label><input class="inp" type="number" id="s4_utilidad" placeholder="Ej. 450000" /></div>
+        <div><label class="lbl">Pérdida Fiscal (MXN, si aplica)</label><input class="inp" type="number" id="s4_perdida" placeholder="Ej. 0 si no hay" /></div>
+        <div><label class="lbl">Capacidad de Pago Mensual (MXN) *</label><input class="inp" type="number" id="s4_capacidad" placeholder="Ej. 85000" /></div>
+      </div>
+      <div style="height:1px;background:rgba(196,161,92,.12);margin:20px 0"></div>
+      <div style="font-family:'Montserrat',sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Solicitud de Financiamiento</div>
+      <div class="grid3">
+        <div><label class="lbl">Monto Solicitado (MXN)</label><input class="inp" type="number" id="s4_monto" placeholder="Ej. 1500000" /></div>
+        <div><label class="lbl">Destino del Crédito</label>
+          <select class="inp" id="s4_destino">
+            <option value="">Seleccionar...</option>
+            <option value="capital_trabajo">Capital de trabajo</option>
+            <option value="equipo">Equipo / Maquinaria</option>
+            <option value="expansion">Expansión</option>
+            <option value="inmueble">Adquisición de inmueble</option>
+            <option value="refinanciamiento">Refinanciamiento</option>
+            <option value="tecnologia">Tecnología</option>
+          </select>
+        </div>
+        <div><label class="lbl">Plazo Deseado</label>
+          <select class="inp" id="s4_plazo">
+            <option value="">Seleccionar...</option>
+            <option value="12">12 meses</option><option value="24">24 meses</option>
+            <option value="36">36 meses</option><option value="48">48 meses</option>
+            <option value="60">60 meses</option><option value="mas">Más de 60 meses</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-o" onclick="showStep(3)">← Atrás</button>
+      <button class="btn-g" onclick="next4()">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: Historial Crediticio -->
+  <div id="view-step5" style="display:none">
+    <div class="steps" id="dots5"></div>
+    <div class="step-label">📋 Paso 5 de 6 — Historial Crediticio</div>
+    <div class="card">
+      <div class="grid2">
+        <div class="span2"><label class="lbl">¿Tiene historial en Buró de Crédito? *</label>
+          <select class="inp" id="s5_historial">
+            <option value="">Seleccionar...</option>
+            <option value="si_positivo">Sí — Historial positivo sin manchas</option>
+            <option value="si_regular">Sí — Con algunas incidencias resueltas</option>
+            <option value="si_negativo">Sí — Con incidencias activas</option>
+            <option value="sin_historial">Sin historial (empresa nueva o sin créditos previos)</option>
+          </select>
+        </div>
+        <div><label class="lbl">Score Buró (si lo conoce)</label><input class="inp" type="number" id="s5_score" placeholder="Ej. 680" /></div>
+        <div><label class="lbl">Número de Créditos Activos</label><input class="inp" type="number" id="s5_creditos" min="0" placeholder="Ej. 2" /></div>
+        <div><label class="lbl">Monto Total Créditos Activos (MXN)</label><input class="inp" type="number" id="s5_monto_creditos" placeholder="Ej. 350000" /></div>
+        <div><label class="lbl">Días de Mora Máximos Registrados</label>
+          <select class="inp" id="s5_mora">
+            <option value="">Seleccionar...</option>
+            <option value="0">0 días — Sin mora</option>
+            <option value="1_30">1 a 30 días</option>
+            <option value="31_60">31 a 60 días</option>
+            <option value="61_90">61 a 90 días</option>
+            <option value="mas_90">Más de 90 días</option>
+          </select>
+        </div>
+        <div><label class="lbl">Créditos Liquidados Anteriores</label>
+          <select class="inp" id="s5_liquidados">
+            <option value="">Seleccionar...</option>
+            <option value="varios_exitosos">Varios — Liquidados sin problemas</option>
+            <option value="algunos">Algunos — Con incidencias resueltas</option>
+            <option value="ninguno">Ninguno</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-o" onclick="showStep(4)">← Atrás</button>
+      <button class="btn-g" onclick="next5()">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- STEP 6: Garantías -->
+  <div id="view-step6" style="display:none">
+    <div class="steps" id="dots6"></div>
+    <div class="step-label">🔒 Paso 6 de 6 — Garantías</div>
+    <div class="card">
+      <div class="grid2">
+        <div><label class="lbl">¿Dispone de Inmueble como Garantía?</label>
+          <select class="inp" id="s6_inmueble" onchange="toggleInmueble(this.value)">
+            <option value="">Seleccionar...</option>
+            <option value="si_libre">Sí — Libre de gravamen</option>
+            <option value="si_hipotecado">Sí — Con hipoteca parcial</option>
+            <option value="no">No dispone de inmueble</option>
+          </select>
+        </div>
+        <div><label class="lbl">Valor Aproximado del Inmueble (MXN)</label><input class="inp" type="number" id="s6_valor_inmueble" placeholder="Ej. 3500000" /></div>
+        <div><label class="lbl">¿Dispone de Equipo / Maquinaria?</label>
+          <select class="inp" id="s6_equipo">
+            <option value="">Seleccionar...</option>
+            <option value="si">Sí — Con valor significativo</option>
+            <option value="si_menor">Sí — Valor menor</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+        <div><label class="lbl">Valor Aproximado del Equipo (MXN)</label><input class="inp" type="number" id="s6_valor_equipo" placeholder="Ej. 800000" /></div>
+        <div class="span2"><label class="lbl">¿Dispone de Aval?</label>
+          <select class="inp" id="s6_aval">
+            <option value="">Seleccionar...</option>
+            <option value="si_solido">Sí — Aval con buen perfil crediticio</option>
+            <option value="si_regular">Sí — Aval con perfil regular</option>
+            <option value="no">No dispone de aval</option>
+          </select>
+        </div>
+        <div class="span2"><label class="lbl">Otras Garantías Disponibles</label><textarea class="inp" id="s6_otras" rows="3" style="resize:vertical" placeholder="Ej. Inventario valorado en $500,000, cuentas por cobrar, etc."></textarea></div>
+      </div>
+    </div>
+    <div id="error-msg" style="display:none;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-family:'Montserrat',sans-serif;font-size:13px;color:#f87171"></div>
+    <div class="nav-btns">
+      <button class="btn-o" onclick="showStep(5)">← Atrás</button>
+      <button class="btn-g" onclick="generateReport()">Generar Reporte FSM →</button>
+    </div>
+  </div>
+
+  <!-- ANALYZING -->
+  <div id="view-analyzing" style="display:none">
+    <div class="analyzing">
+      <div class="spin"></div>
+      <h2 class="spin-title">Analizando el perfil empresarial</h2>
+      <p class="spin-sub">La IA está procesando todas las dimensiones financieras...<br>Esto puede tardar unos segundos.</p>
+      <div class="spin-items">
+        <div class="spin-item"><div class="spin-dot"></div>Analizando facturación SAT...</div>
+        <div class="spin-item"><div class="spin-dot"></div>Depurando flujos bancarios...</div>
+        <div class="spin-item"><div class="spin-dot"></div>Calculando relaciones analíticas...</div>
+        <div class="spin-item"><div class="spin-dot"></div>Construyendo argumento a favor...</div>
+        <div class="spin-item"><div class="spin-dot"></div>Generando Score FSM...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORT -->
+  <div id="view-report" style="display:none"></div>
+
+</div>
+
+<script>
+var F = {};
+
+function showIntro(){hide();show('intro');}
+function showStep(n){hide();show('step'+n);renderDots(n);}
+function show(id){document.getElementById('view-'+id).style.display='block';}
+function hide(){['intro','step1','step2','step3','step4','step5','step6','analyzing','report'].forEach(function(id){var el=document.getElementById('view-'+id);if(el)el.style.display='none';});}
+
+function renderDots(active){
+  var steps=['Datos','Facturación','Flujos','Financiero','Crédito','Garantías'];
+  var html='';
+  steps.forEach(function(_,i){
+    var n=i+1;
+    var cls=n===active?'active':n<active?'done':'';
+    var w=n===active?'24px':'8px';
+    html+='<div class="step-dot '+cls+'" style="width:'+w+'"></div>';
+  });
+  ['dots1','dots2','dots3','dots4','dots5','dots6'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.innerHTML=html;
+  });
+}
+
+function val(id){var el=document.getElementById(id);return el?el.value:'';}
+
+function next1(){
+  if(!val('s1_razon')||!val('s1_sector')||!val('s1_regimen')||!val('s1_anios')){
+    alert('Por favor completa los campos obligatorios (*).');return;
+  }
+  F.razonSocial=val('s1_razon');F.rfc=val('s1_rfc');F.estado=val('s1_estado');
+  F.sector=val('s1_sector');F.regimen=val('s1_regimen');F.anios=val('s1_anios');F.empleados=val('s1_empleados');
+  showStep(2);
+}
+function next2(){
+  if(!val('s2_promedio')||!val('s2_anual')){alert('Por favor completa los campos obligatorios (*).');return;}
+  F.facturacionPromedio=val('s2_promedio');F.facturacionAnual=val('s2_anual');
+  F.facturacionMin=val('s2_min');F.facturacionMax=val('s2_max');
+  F.mesesSinFacturar=val('s2_meses_sin')||'0';F.tendencia=val('s2_tendencia');
+  F.dependenciaGobierno=val('s2_gobierno');F.clientePct=val('s2_cliente_pct');
+  F.clientes=val('s2_clientes');F.proveedorPct=val('s2_prov_pct');F.proveedores=val('s2_proveedores');
+  showStep(3);
+}
+function next3(){
+  if(!val('s3_promedio')||!val('s3_real')){alert('Por favor completa los campos obligatorios (*).');return;}
+  F.bancoPrincipal=val('s3_banco');F.numeroCuentas=val('s3_cuentas');
+  F.promedioBancario=val('s3_promedio');F.ingresoReal=val('s3_real');
+  F.traspasos=val('s3_traspasos');F.ciclicidad=val('s3_ciclicidad');F.autenticidad=val('s3_autenticidad');
+  showStep(4);
+}
+function next4(){
+  if(!val('s4_activos')||!val('s4_pasivos')||!val('s4_capacidad')){alert('Por favor completa los campos obligatorios (*).');return;}
+  F.totalActivos=val('s4_activos');F.totalPasivos=val('s4_pasivos');
+  F.activoCirculante=val('s4_circulante');F.capital=val('s4_capital');
+  F.pasivoCP=val('s4_pasivo_cp');F.pasivoLP=val('s4_pasivo_lp');
+  F.utilidad=val('s4_utilidad');F.perdidaFiscal=val('s4_perdida')||'0';
+  F.capacidadPago=val('s4_capacidad');
+  F.montoSolicitado=val('s4_monto');F.destino=val('s4_destino');F.plazo=val('s4_plazo');
+  showStep(5);
+}
+function next5(){
+  if(!val('s5_historial')){alert('Por favor selecciona el estado del historial crediticio.');return;}
+  F.historial=val('s5_historial');F.scoreBuro=val('s5_score');
+  F.creditosActivos=val('s5_creditos');F.montoCreditosActivos=val('s5_monto_creditos');
+  F.mora=val('s5_mora');F.creditosLiquidados=val('s5_liquidados');
+  showStep(6);
+}
+
+function generateReport(){
+  F.inmueble=val('s6_inmueble');F.valorInmueble=val('s6_valor_inmueble')||'0';
+  F.equipo=val('s6_equipo');F.valorEquipo=val('s6_valor_equipo')||'0';
+  F.aval=val('s6_aval');F.otrasGarantias=val('s6_otras');
+  hide();show('analyzing');
+  setTimeout(function(){buildLocalReport();},2500);
+}
+
+function buildLocalReport(){
+  var activos=+F.totalActivos||0,pasivos=+F.totalPasivos||0;
+  var circulante=+F.activoCirculante||0,pasivoCP=+F.pasivoCP||0;
+  var capital=+F.capital||0,utilidad=+F.utilidad||0;
+  var facturacion=+F.facturacionPromedio||0,ingresoReal=+F.ingresoReal||0;
+  var promBancario=+F.promedioBancario||0,capacidad=+F.capacidadPago||0;
+  var monto=+F.montoSolicitado||0,valorInmueble=+F.valorInmueble||0;
+  var razonLiq=pasivoCP>0?(circulante/pasivoCP).toFixed(2):'N/A';
+  var razonEnd=activos>0?((pasivos/activos)*100).toFixed(1):'N/A';
+  var brecha=promBancario>0?(((promBancario-ingresoReal)/promBancario)*100).toFixed(1):'0';
+  var cobertura=monto>0&&valorInmueble>0?((valorInmueble/monto)*100).toFixed(0):'N/A';
+
+  var score=Math.min(95,Math.max(30,
+    (F.historial&&F.historial.includes('positivo')?20:F.historial&&F.historial.includes('sin_historial')?10:5)+
+    (F.tendencia==='creciente'?20:F.tendencia==='estable'?15:8)+
+    (F.autenticidad&&(F.autenticidad.includes('originales')||F.autenticidad.includes('cfdi'))?15:5)+
+    (F.inmueble&&F.inmueble.includes('libre')?15:F.inmueble&&F.inmueble.includes('hipotecado')?8:3)+
+    (F.mora==='0'||F.mora==='no'?15:5)+
+    (+F.anios>=3?10:5)
+  ));
+
+  var scoreColor=score>=70?'#4ade80':score>=50?'#facc15':'#f87171';
+  var scoreLevel=score>=75?'Alto':score>=60?'Medio-Alto':score>=45?'Medio':'En Desarrollo';
+  var scoreSem=score>=65?'verde':score>=45?'amarillo':'rojo';
+
+  function sem(s){return s==='verde'?'#4ade80':s==='amarillo'?'#facc15':'#f87171';}
+  function semBg(s){return s==='verde'?'74,222,128':s==='amarillo'?'250,204,21':'248,113,113';}
+  function semLabel(s){return s==='verde'?'Favorable':s==='amarillo'?'Atención':'Riesgo';}
+
+  var s2sem=F.tendencia==='creciente'||F.tendencia==='estable'?'verde':'amarillo';
+  var s3sem=F.autenticidad&&F.autenticidad.includes('dudosa')?'rojo':+brecha>30?'amarillo':'verde';
+  var s4sem=+razonEnd<60&&utilidad>=0?'verde':+razonEnd<75?'amarillo':'rojo';
+  var s5sem=F.historial==='si_positivo'?'verde':F.historial==='si_negativo'?'rojo':'amarillo';
+  var s6sem=F.inmueble==='si_libre'?'verde':'amarillo';
+
+  function sTag(s){
+    return '<span class="semaforo-tag" style="background:rgba('+semBg(s)+',.15);color:'+sem(s)+';border:1px solid rgba('+semBg(s)+',.3)">'+semLabel(s)+'</span>';
+  }
+
+  function secCard(sem2,title,hallazgos,comentario){
+    var h=hallazgos.map(function(h){return '<li>'+h+'</li>';}).join('');
+    return '<div class="sec-card '+sem2+'">'+
+      '<div class="sec-header"><div class="sec-title">'+title+'</div>'+sTag(sem2)+'</div>'+
+      '<ul class="sec-hallazgos">'+h+'</ul>'+
+      '<p class="sec-comentario">'+comentario+'</p>'+
+      '</div>';
+  }
+
+  var mensualidad=monto>0&&+F.plazo>0?Math.round((monto*1.18)/+F.plazo):0;
+  var pctCapacidad=capacidad>0&&mensualidad>0?((mensualidad/capacidad)*100).toFixed(0):'N/A';
+
+  var sections=
+    secCard('verde','Perfil Empresarial',[
+      F.razonSocial+' — '+F.sector+', '+F.anios+' años de operación en '+F.estado,
+      'Régimen fiscal: '+F.regimen+' — compatible con el mercado no bancario',
+      F.empleados?'Plantilla de '+F.empleados+' empleados — empresa con operación consolidada':'Perfil de empresa con operación activa'
+    ],'La empresa presenta los elementos básicos de elegibilidad para productos del portafolio FSM Global Advisory.')+
+
+    secCard(s2sem,'Análisis de Facturación SAT — 24 meses',[
+      'Facturación promedio mensual: $'+Number(facturacion).toLocaleString()+' MXN — tendencia '+F.tendencia,
+      +F.mesesSinFacturar>0?F.mesesSinFacturar+' meses sin facturación detectados — requiere justificación':'Facturación continua sin interrupciones — indicador positivo',
+      +F.dependenciaGobierno>30?'Dependencia de gobierno del '+F.dependenciaGobierno+'% — riesgo de concentración moderado':+F.clientePct>40?'Cliente principal representa el '+F.clientePct+'% — concentración elevada a documentar':'Diversificación de ingresos aceptable para el perfil solicitado'
+    ],'La facturación SAT es el principal argumento de ingresos ante cualquier financiera del portafolio. Facturación anual de $'+Number(+F.facturacionAnual).toLocaleString()+' MXN.')+
+
+    secCard(s3sem,'Análisis de Flujos Bancarios — 12 meses',[
+      'Promedio bancario bruto: $'+Number(promBancario).toLocaleString()+' MXN | Ingreso real depurado: $'+Number(ingresoReal).toLocaleString()+' MXN',
+      'Brecha ingreso bancario vs. real: '+brecha+'% — '+( +brecha>25?'traspasos elevados, requiere documentación':'dentro de parámetros normales'),
+      'Ciclicidad: '+F.ciclicidad+' | Autenticidad: '+F.autenticidad
+    ],'El ingreso real depurado de $'+Number(ingresoReal).toLocaleString()+' MXN es verificable a través de los estados de cuenta y constituye la base del análisis de capacidad de pago.')+
+
+    secCard(s4sem,'Estados Financieros — Relaciones Analíticas',[
+      'Razón de liquidez: '+razonLiq+'x — '+( +razonLiq>=1.5?'solvencia a corto plazo sólida':+razonLiq>=1?'liquidez positiva pero ajustada':'requiere refuerzo con garantía adicional'),
+      'Razón de endeudamiento: '+razonEnd+'% — '+( +razonEnd<50?'apalancamiento conservador, amplio margen para nueva deuda':+razonEnd<70?'nivel moderado, justificar con flujo de caja':'endeudamiento elevado'),
+      monto>0?'Capacidad de pago: '+pctCapacidad+'% del flujo libre comprometido en servicio de deuda':'Capacidad de pago mensual estimada: $'+Number(capacidad).toLocaleString()+' MXN'
+    ],+F.perdidaFiscal>0?'Pérdida fiscal de $'+Number(+F.perdidaFiscal).toLocaleString()+' MXN — preparar explicación documentada de su origen para neutralizar impacto en análisis.':'Sin pérdida fiscal — perfil fiscal limpio y favorable para la evaluación institucional.')+
+
+    secCard(s5sem,'Historial Crediticio',[
+      F.historial==='si_positivo'?'Historial positivo — activo principal para la colocación':F.historial==='sin_historial'?'Sin historial formal — financieras no bancarias priorizan flujo de caja sobre historial':F.historial==='si_regular'?'Historial con incidencias resueltas — documentar con cartas de liberación':'Historial con incidencias activas — requiere plan de regularización',
+      +F.creditosActivos>0?F.creditosActivos+' crédito(s) activo(s) por $'+Number(+F.montoCreditosActivos).toLocaleString()+' MXN':'Sin créditos activos — empresa sin compromisos financieros formales vigentes'
+    ],F.historial==='si_positivo'?'El historial crediticio es el activo más sólido del perfil para la colocación.':F.historial==='sin_historial'?'La ausencia de historial no es impedimento — las financieras no bancarias priorizan el flujo de caja real sobre el historial formal.':'El historial requiere manejo cuidadoso en la presentación del expediente.')+
+
+    secCard(s6sem,'Garantías y Colateral',[
+      F.inmueble==='si_libre'?'Inmueble libre de gravamen: $'+Number(valorInmueble).toLocaleString()+' MXN — garantía de primer nivel':F.inmueble==='si_hipotecado'?'Inmueble con hipoteca parcial — evaluar valor residual disponible':'Sin inmueble — estructurar con garantía prendaria o aval',
+      F.aval==='si_solido'?'Aval con perfil crediticio sólido — refuerza significativamente la solicitud':F.aval==='si_regular'?'Aval disponible — profundizar en perfil antes de presentar':'Sin aval identificado — considerar incluir uno para ampliar opciones'
+    ],valorInmueble>0&&monto>0?'Cobertura de garantía: '+cobertura+'% del monto solicitado ($'+Number(monto).toLocaleString()+' MXN).':'El esquema de garantías requiere estructuración para maximizar las opciones de colocación disponibles.');
+
+  var argumento=F.razonSocial+' es una empresa del sector '+F.sector+' con '+F.anios+' años de trayectoria comprobable vía SAT y estados de cuenta bancarios, con una facturación promedio mensual de $'+Number(facturacion).toLocaleString()+' MXN y un ingreso real depurado de $'+Number(ingresoReal).toLocaleString()+' MXN. La consistencia de su flujo de caja es el argumento central para la colocación: la empresa genera suficientes recursos para cubrir el servicio de deuda solicitado con un margen de seguridad adecuado.\n\nDesde el análisis de estados financieros, la empresa presenta una razón de endeudamiento del '+razonEnd+'% y un capital contable de $'+Number(capital).toLocaleString()+' MXN, lo que indica que existe base patrimonial real. La capacidad de pago mensual estimada de $'+Number(capacidad).toLocaleString()+' MXN es verificable a través de los estados de cuenta bancarios presentados.\n\nEl monto solicitado de $'+Number(monto).toLocaleString()+' MXN tiene un destino productivo claramente definido ('+F.destino+'), lo que incrementa la probabilidad de recuperación de la inversión. FSM Global Advisory presenta este expediente con el respaldo de 6 años de experiencia y 45 alianzas financieras directas en el mercado no bancario mexicano.';
+
+  var productos=[
+    {p:'Crédito Simple para Capital de Trabajo',i:'Fintech / Fondo de Deuda No Bancario',r:'Facturación SAT continua y flujo bancario verificable cumplen criterios de elegibilidad',m:'$'+Number(Math.round(monto*.8)).toLocaleString()+' — $'+Number(monto).toLocaleString()+' MXN'},
+    {p:'Línea Revolvente',i:'Financiera especializada en PyME',r:'Facturación con tendencia '+F.tendencia+' ideal para línea revolvente — flexibilidad para ciclo de negocio',m:'$'+Number(Math.round(facturacion*1.5)).toLocaleString()+' — $'+Number(Math.round(facturacion*2.5)).toLocaleString()+' MXN'}
+  ];
+  if(F.sector==='Agropecuario')productos.push({p:'Financiamiento FIRA',i:'FIRA — Fondo de Fomento',r:'Sector agropecuario con condiciones preferenciales disponibles',m:'Hasta $20 MDP'});
+
+  var recomendaciones=[
+    {pr:'alta',a:+F.mesesSinFacturar>0?'Documentar y justificar los '+F.mesesSinFacturar+' meses sin facturación con carta explicativa':'Mantener la facturación continua durante el proceso de gestión del crédito',i:'Elimina la principal objeción de riesgo ante el analista de la financiera'},
+    {pr:'media',a:F.aval==='no'||!F.aval?'Identificar y documentar un aval con buen perfil crediticio':'Actualizar estados financieros al período más reciente',i:'Amplía el número de financieras elegibles y puede mejorar las condiciones'},
+    {pr:'baja',a:'Consolidar documentación de clientes y contratos vigentes',i:'Incrementa la confianza de la financiera en la estabilidad de los ingresos futuros'}
+  ];
+
+  function prColor(p){return p==='alta'?'248,113,113':p==='media'?'250,204,21':'74,222,128';}
+  function prHex(p){return p==='alta'?'#f87171':p==='media'?'#facc15':'#4ade80';}
+
+  var desglose={facturacion:Math.min(100,F.tendencia==='creciente'?85:F.tendencia==='estable'?75:55),flujos:Math.min(100,F.autenticidad&&(F.autenticidad.includes('originales')||F.autenticidad.includes('cfdi'))?80:60),estadosFinancieros:Math.min(100,+razonEnd<50?80:+razonEnd<70?65:45),historialCrediticio:Math.min(100,F.historial==='si_positivo'?90:F.historial==='sin_historial'?55:F.historial==='si_regular'?60:30),garantias:Math.min(100,F.inmueble==='si_libre'?90:F.inmueble==='si_hipotecado'?65:F.aval==='si_solido'?55:35)};
+
+  var html=
+    '<div class="report-header fade-up">'+
+    '<div style="font-family:Montserrat,sans-serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(196,161,92,.6);margin-bottom:8px">Reporte de Diagnóstico Financiero Institucional</div>'+
+    '<div class="report-name">'+F.razonSocial+'</div>'+
+    '<div class="report-meta">'+F.sector+' · '+F.anios+' años de operación · '+F.estado+'</div>'+
+    '<p class="report-summary">'+ F.razonSocial +' presenta un perfil financiero con Score FSM de '+score+'/100 ('+scoreLevel+'). Con una facturación promedio de $'+Number(facturacion).toLocaleString()+' MXN mensuales e ingreso real bancario de $'+Number(ingresoReal).toLocaleString()+' MXN, la empresa tiene viabilidad crediticia en el mercado no bancario. La capacidad de pago estimada de $'+Number(capacidad).toLocaleString()+' MXN mensuales permite soportar el servicio de deuda del monto solicitado dentro de parámetros razonables.</p>'+
+    '</div>'+
+
+    '<div class="score-box fade-up">'+
+    '<div class="score-ring">'+
+    '<svg width="120" height="120" viewBox="0 0 120 120">'+
+    '<circle cx="60" cy="60" r="50" fill="none" stroke="rgba(196,161,92,.1)" stroke-width="8"/>'+
+    '<circle cx="60" cy="60" r="50" fill="none" stroke="'+scoreColor+'" stroke-width="8"'+
+    ' stroke-dasharray="'+2*Math.PI*50+'" stroke-dashoffset="'+2*Math.PI*50*(1-score/100)+'"'+
+    ' stroke-linecap="round" transform="rotate(-90 60 60)"/>'+
+    '<text x="60" y="55" text-anchor="middle" fill="'+scoreColor+'" font-size="26" font-weight="700" font-family="Montserrat">'+score+'</text>'+
+    '<text x="60" y="70" text-anchor="middle" fill="rgba(232,223,200,.4)" font-size="9" font-family="Montserrat">/ 100</text>'+
+    '</svg>'+
+    '<div style="font-family:Montserrat,sans-serif;font-size:12px;font-weight:600;color:'+scoreColor+';margin-top:4px">Score FSM: '+scoreLevel+'</div>'+
+    '</div>'+
+    '<div class="score-bars">'+
+    '<div style="font-family:Montserrat,sans-serif;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#c4a15c;margin-bottom:14px">Desglose por Dimensión</div>'+
+    Object.entries(desglose).map(function(e){
+      var k=e[0],v=e[1];
+      var c=v>=70?'#4ade80':v>=50?'#facc15':'#f87171';
+      var label={facturacion:'Facturación',flujos:'Flujos',estadosFinancieros:'Estados Financieros',historialCrediticio:'Historial',garantias:'Garantías'}[k]||k;
+      return '<div class="bar-row"><div class="bar-label"><span>'+label+'</span><span style="color:'+c+';font-weight:600">'+v+'</span></div><div class="bar-track"><div class="bar-fill" style="width:'+v+'%;background:'+c+'"></div></div></div>';
+    }).join('')+
+    '</div></div>'+
+
+    sections+
+
+    '<div class="argumento fade-up">'+
+    '<div class="arg-header">'+
+    '<div class="arg-icon">🎯</div>'+
+    '<div><div class="arg-title">Argumento a Favor — FSM</div><div class="arg-sub">El punto más sólido para presentar ante la financiera</div></div>'+
+    '</div>'+
+    '<p class="arg-text">'+argumento.replace(/\n/g,'<br><br>')+'</p>'+
+    '</div>'+
+
+    '<div class="fade-up" style="background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.12);border-radius:12px;padding:24px;margin-bottom:12px">'+
+    '<div class="sec-label">Productos Financieros Recomendados</div>'+
+    productos.map(function(p){
+      return '<div class="prods-card"><div style="display:flex;justify-content:space-between;align-items:start"><div><div class="prod-name">'+p.p+'</div><div class="prod-inst">'+p.i+'</div><div class="prod-razon">'+p.r+'</div></div><div class="prod-monto">'+p.m+'</div></div></div>';
+    }).join('')+
+    '</div>'+
+
+    '<div class="fade-up" style="background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.12);border-radius:12px;padding:24px;margin-bottom:12px">'+
+    '<div class="sec-label">Plan de Mejora</div>'+
+    recomendaciones.map(function(r){
+      return '<div class="recs-item"><span class="prior-tag" style="background:rgba('+prColor(r.pr)+',.12);color:'+prHex(r.pr)+';border:1px solid rgba('+prColor(r.pr)+',.25)">'+r.pr.toUpperCase()+'</span><div><div class="rec-accion">'+r.a+'</div><div class="rec-impacto">'+r.i+'</div></div></div>';
+    }).join('')+
+    '</div>'+
+
+    '<div class="broker-note fade-up">'+
+    '<div class="broker-label">🔐 Nota Confidencial para el Broker</div>'+
+    '<p class="broker-text">ESTRATEGIA DE COLOCACIÓN RECOMENDADA — CONFIDENCIAL FSM\n\nPara '+F.razonSocial+', el ángulo más sólido de presentación es el flujo de caja real ($'+Number(ingresoReal).toLocaleString()+' MXN/mes) y la continuidad de facturación SAT. Priorizar financieras que evalúen por flujo bancario sobre las que dependen exclusivamente de estados financieros auditados.\n\nPerfil de financieras a priorizar: '+( F.inmueble==='si_libre'?'Fondos de deuda con garantía hipotecaria — acceso a mejores tasas':'Fintechs y fondos de deuda con garantía prendaria o aval — proceso más ágil')+'. Tiempo estimado de colocación: 15-25 días hábiles con expediente completo.</p>'+
+    '</div>'+
+
+    '<div style="text-align:center;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px">'+
+    '<button class="btn-o" onclick="resetForm()">+ Nueva Evaluación</button>'+
+    '<button class="btn-g" onclick="window.print()">Imprimir / Guardar PDF</button>'+
+    '</div>'+
+
+    '<div class="footer-report">'+
+    '<div class="footer-brand">Financial Success Mexico — Beyond the Limits</div>'+
+    '<div class="footer-pow">Reporte generado con tecnología FinBroker MX · Uso confidencial</div>'+
+    '</div>';
+
+  document.getElementById('view-report').innerHTML=html;
+  hide();show('report');
+  window.scrollTo(0,0);
+}
+
+function resetForm(){
+  F={};
+  document.querySelectorAll('.inp').forEach(function(el){el.value='';});
+  showIntro();window.scrollTo(0,0);
+}
+
+// Init
+showIntro();
+</script>
+</body>
+</html>

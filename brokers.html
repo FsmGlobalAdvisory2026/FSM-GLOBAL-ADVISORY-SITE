@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinBroker MX — Acceso Brokers | FSM Global Advisory</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --gold: #c4a15c; --gold2: #a8843e; --dark: #090e1c; --text: #e8dfc8; }
+    html, body { height: 100%; }
+    body { background: var(--dark); color: var(--text); font-family: 'Cormorant Garamond', Georgia, serif; display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* BG */
+    .bg-circles { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+    .bg-c1 { position: absolute; top: -10%; right: -5%; width: 500px; height: 500px; border: 1px solid rgba(196,161,92,.05); border-radius: 50%; animation: float 10s ease-in-out infinite; }
+    .bg-c2 { position: absolute; bottom: -10%; left: -5%; width: 400px; height: 400px; border: 1px solid rgba(196,161,92,.04); border-radius: 50%; animation: float 8s ease-in-out 2s infinite; }
+    .bg-glow { position: absolute; top: 30%; left: 50%; transform: translate(-50%,-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(196,161,92,.04) 0%, transparent 70%); }
+
+    /* HEADER */
+    header { position: relative; z-index: 10; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(196,161,92,.08); }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+    .brand-icon { width: 32px; height: 32px; background: linear-gradient(135deg, var(--gold), var(--gold2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 14px; color: #080d1a; }
+    .brand-name { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 13px; }
+    .brand-sub { font-family: 'Montserrat', sans-serif; font-size: 8px; color: var(--gold); letter-spacing: .15em; text-transform: uppercase; }
+    .back-link { font-family: 'Montserrat', sans-serif; font-size: 11px; color: rgba(232,223,200,.5); text-decoration: none; letter-spacing: .08em; transition: color .2s; }
+    .back-link:hover { color: var(--gold); }
+
+    /* MAIN */
+    main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; position: relative; z-index: 10; }
+
+    /* LOGIN CARD */
+    .login-card { width: 100%; max-width: 440px; }
+    .login-header { text-align: center; margin-bottom: 40px; }
+    .login-badge { display: inline-block; padding: 5px 14px; background: rgba(196,161,92,.1); border: 1px solid rgba(196,161,92,.25); border-radius: 20px; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+    .login-title { font-size: 36px; font-weight: 300; line-height: 1.1; margin-bottom: 10px; }
+    .login-title em { color: var(--gold); font-style: italic; }
+    .login-sub { font-family: 'Montserrat', sans-serif; font-size: 13px; color: rgba(232,223,200,.5); font-weight: 300; line-height: 1.6; }
+    .login-box { background: rgba(255,255,255,.025); border: 1px solid rgba(196,161,92,.15); border-radius: 20px; padding: 36px; }
+    .form-group { margin-bottom: 20px; }
+    .form-label { font-family: 'Montserrat', sans-serif; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 8px; }
+    .form-input { background: rgba(255,255,255,.04); border: 1px solid rgba(196,161,92,.2); border-radius: 10px; color: var(--text); padding: 13px 16px; font-size: 14px; width: 100%; font-family: 'Montserrat', sans-serif; transition: all .2s; outline: none; }
+    .form-input:focus { border-color: rgba(196,161,92,.6); box-shadow: 0 0 0 3px rgba(196,161,92,.07); }
+    .form-input::placeholder { color: rgba(232,223,200,.2); }
+    .pw-wrap { position: relative; }
+    .pw-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: rgba(232,223,200,.4); cursor: pointer; font-size: 16px; padding: 4px; }
+    .pw-toggle:hover { color: var(--gold); }
+    .btn-login { width: 100%; background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #080d1a; border: none; padding: 15px; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; border-radius: 10px; cursor: pointer; transition: all .2s; margin-top: 8px; }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(196,161,92,.3); opacity: .92; }
+    .btn-login:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+    .error-msg { background: rgba(248,113,113,.08); border: 1px solid rgba(248,113,113,.25); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-family: 'Montserrat', sans-serif; font-size: 12px; color: #f87171; display: none; }
+    .divider { height: 1px; background: rgba(196,161,92,.1); margin: 24px 0; }
+    .help-text { text-align: center; font-family: 'Montserrat', sans-serif; font-size: 12px; color: rgba(232,223,200,.4); line-height: 1.6; }
+    .help-text a { color: var(--gold); text-decoration: none; }
+    .help-text a:hover { text-decoration: underline; }
+
+    /* FEATURES */
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 32px; }
+    .feat { text-align: center; padding: 16px 12px; background: rgba(255,255,255,.02); border: 1px solid rgba(196,161,92,.08); border-radius: 12px; }
+    .feat-icon { font-size: 20px; margin-bottom: 6px; }
+    .feat-label { font-family: 'Montserrat', sans-serif; font-size: 10px; color: rgba(232,223,200,.5); line-height: 1.4; }
+
+    /* FOOTER */
+    footer { position: relative; z-index: 10; padding: 20px 32px; border-top: 1px solid rgba(196,161,92,.08); text-align: center; }
+    .footer-text { font-family: 'Montserrat', sans-serif; font-size: 10px; color: rgba(232,223,200,.25); letter-spacing: .1em; }
+
+    /* LOADING */
+    .loading { display: none; align-items: center; justify-content: center; gap: 10px; }
+    .loading.show { display: flex; }
+    .spinner { width: 18px; height: 18px; border: 2px solid rgba(8,13,26,.3); border-top: 2px solid #080d1a; border-radius: 50%; animation: spin .7s linear infinite; }
+
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    .login-card { animation: fadeIn .6s ease forwards; }
+  </style>
+</head>
+<body>
+
+  <div class="bg-circles">
+    <div class="bg-glow"></div>
+    <div class="bg-c1"></div>
+    <div class="bg-c2"></div>
+  </div>
+
+  <header>
+    <a href="index.html" class="brand">
+      <div class="brand-icon">F</div>
+      <div>
+        <div class="brand-name">FSM Global Advisory</div>
+        <div class="brand-sub">FinBroker MX Platform</div>
+      </div>
+    </a>
+    <a href="index.html" class="back-link">← Volver al sitio</a>
+  </header>
+
+  <main>
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-badge">Acceso Exclusivo Brokers</div>
+        <h1 class="login-title">Bienvenido a<br><em>FinBroker MX</em></h1>
+        <p class="login-sub">Ingresa tus credenciales para acceder a la plataforma de gestión de casos y expedientes.</p>
+      </div>
+
+      <div class="login-box">
+        <div class="error-msg" id="error-msg">
+          ❌ Credenciales incorrectas. Verifica tu correo y contraseña.
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Correo electrónico</label>
+          <input class="form-input" type="email" id="email" placeholder="tu@correo.com" autocomplete="email" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <div class="pw-wrap">
+            <input class="form-input" type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+            <button class="pw-toggle" onclick="togglePw()" type="button" id="pw-toggle">👁️</button>
+          </div>
+        </div>
+
+        <button class="btn-login" id="btn-login" onclick="doLogin()">
+          <span id="btn-text">Ingresar a la plataforma</span>
+          <div class="loading" id="loading"><div class="spinner"></div> Verificando...</div>
+        </button>
+
+        <div class="divider"></div>
+
+        <div class="help-text">
+          ¿No tienes acceso aún? <a href="index.html#brokers">Conoce el programa de brokers</a><br />
+          ¿Problemas para ingresar? <a href="https://wa.me/529611717870" target="_blank">Contáctanos por WhatsApp</a>
+        </div>
+      </div>
+
+      <div class="features">
+        <div class="feat"><div class="feat-icon">📁</div><div class="feat-label">Gestión de expedientes</div></div>
+        <div class="feat"><div class="feat-icon">📊</div><div class="feat-label">Reporte FSM incluido</div></div>
+        <div class="feat"><div class="feat-icon">💰</div><div class="feat-label">Tabulador de comisiones</div></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-text">© 2025 FSM Global Advisory · FinBroker MX Technology · Uso exclusivo para brokers afiliados</div>
+  </footer>
+
+  <script>
+    // USERS DB — Solo para prototipo
+    // En producción esto va en servidor seguro
+    var USERS = [
+      {
+        email: "financialsuccess.mexico@gmail.com",
+        password: "Fsm2026@",
+        nombre: "FSM Admin",
+        rol: "admin",
+        membresia: "activa"
+      }
+    ];
+
+    function togglePw() {
+      var inp = document.getElementById('password');
+      var btn = document.getElementById('pw-toggle');
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.textContent = '🙈';
+      } else {
+        inp.type = 'password';
+        btn.textContent = '👁️';
+      }
+    }
+
+    function doLogin() {
+      var email = document.getElementById('email').value.trim().toLowerCase();
+      var password = document.getElementById('password').value;
+      var errorMsg = document.getElementById('error-msg');
+      var btnText = document.getElementById('btn-text');
+      var loading = document.getElementById('loading');
+      var btn = document.getElementById('btn-login');
+
+      // Validar campos
+      if (!email || !password) {
+        errorMsg.textContent = '⚠️ Por favor ingresa tu correo y contraseña.';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      // Mostrar loading
+      errorMsg.style.display = 'none';
+      btnText.style.display = 'none';
+      loading.classList.add('show');
+      btn.disabled = true;
+
+      // Simular verificación
+      setTimeout(function() {
+        var user = USERS.find(function(u) {
+          return u.email.toLowerCase() === email && u.password === password;
+        });
+
+        if (user) {
+          // Guardar sesión
+          sessionStorage.setItem('fsm_user', JSON.stringify(user));
+          // Redirigir al dashboard
+          window.location.href = 'dashboard.html';
+        } else {
+          loading.classList.remove('show');
+          btnText.style.display = 'block';
+          btn.disabled = false;
+          errorMsg.textContent = '❌ Credenciales incorrectas. Verifica tu correo y contraseña.';
+          errorMsg.style.display = 'block';
+          document.getElementById('password').value = '';
+        }
+      }, 1500);
+    }
+
+    // Enter key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') doLogin();
+    });
+
+    // Verificar si ya hay sesión activa
+    var session = sessionStorage.getItem('fsm_user');
+    if (session) {
+      window.location.href = 'dashboard.html';
+    }
+  </script>
+
+</body>
+</html>

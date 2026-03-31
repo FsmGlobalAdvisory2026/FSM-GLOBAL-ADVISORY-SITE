@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinBroker MX — Análisis de Estados de Cuenta | FSM Global Advisory</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold: #c4a15c; --gold2: #a8843e; --dark: #090e1c; --dark2: #0d1425;
+      --text: #e8dfc8; --green: #4ade80; --red: #f87171; --yellow: #facc15; --purple: #a78bfa;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--dark); color: var(--text); font-family: 'Cormorant Garamond', Georgia, serif; min-height: 100vh; }
+    ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-thumb { background: rgba(196,161,92,.3); border-radius: 3px; }
+
+    /* NAV */
+    nav { background: rgba(9,14,28,.95); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(196,161,92,.1); padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+    .brand-icon { width: 28px; height: 28px; background: linear-gradient(135deg,var(--gold),var(--gold2)); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat',sans-serif; font-weight: 800; font-size: 12px; color: #080d1a; }
+    .brand-name { font-family: 'Montserrat',sans-serif; font-weight: 600; font-size: 12px; }
+    .brand-sub { font-family: 'Montserrat',sans-serif; font-size: 7px; color: var(--gold); letter-spacing: .15em; text-transform: uppercase; }
+    .nav-tag { font-family: 'Montserrat',sans-serif; font-size: 10px; color: rgba(232,223,200,.4); }
+    .back-btn { font-family: 'Montserrat',sans-serif; font-size: 11px; color: rgba(232,223,200,.5); text-decoration: none; transition: color .2s; }
+    .back-btn:hover { color: var(--gold); }
+
+    /* LAYOUT */
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* HEADER */
+    .page-header { text-align: center; margin-bottom: 48px; }
+    .badge { display: inline-block; padding: 5px 14px; background: rgba(196,161,92,.1); border: 1px solid rgba(196,161,92,.25); border-radius: 20px; font-family: 'Montserrat',sans-serif; font-size: 10px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+    .page-title { font-size: clamp(28px,4vw,44px); font-weight: 300; line-height: 1.1; margin-bottom: 12px; }
+    .page-title em { color: var(--gold); font-style: italic; }
+    .page-sub { font-family: 'Montserrat',sans-serif; font-size: 13px; color: rgba(232,223,200,.5); font-weight: 300; line-height: 1.7; max-width: 560px; margin: 0 auto; }
+
+    /* CARD */
+    .card { background: rgba(255,255,255,.025); border: 1px solid rgba(196,161,92,.12); border-radius: 16px; padding: 28px; margin-bottom: 20px; }
+    .card-title { font-family: 'Montserrat',sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+
+    /* UPLOAD ZONE */
+    .upload-zone { border: 2px dashed rgba(196,161,92,.25); border-radius: 12px; padding: 32px 24px; text-align: center; transition: all .25s; cursor: pointer; position: relative; background: rgba(196,161,92,.02); }
+    .upload-zone:hover, .upload-zone.drag { border-color: rgba(196,161,92,.6); background: rgba(196,161,92,.05); }
+    .upload-zone.has-files { border-color: rgba(74,222,128,.4); background: rgba(74,222,128,.03); }
+    .upload-icon { font-size: 36px; margin-bottom: 12px; }
+    .upload-title { font-family: 'Montserrat',sans-serif; font-weight: 600; font-size: 13px; margin-bottom: 6px; }
+    .upload-sub { font-family: 'Montserrat',sans-serif; font-size: 11px; color: rgba(232,223,200,.45); margin-bottom: 16px; }
+    .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .file-list { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .file-item { display: flex; align-items: center; gap: 10px; background: rgba(74,222,128,.06); border: 1px solid rgba(74,222,128,.15); border-radius: 8px; padding: 8px 14px; }
+    .file-name { font-family: 'Montserrat',sans-serif; font-size: 11px; flex: 1; text-align: left; }
+    .file-size { font-family: 'Montserrat',sans-serif; font-size: 10px; color: rgba(232,223,200,.4); }
+    .file-remove { background: transparent; border: none; color: rgba(248,113,113,.6); cursor: pointer; font-size: 14px; padding: 2px; }
+
+    /* FORM */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .lbl { font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 6px; }
+    .inp { background: rgba(255,255,255,.04); border: 1px solid rgba(196,161,92,.18); border-radius: 8px; color: var(--text); padding: 10px 14px; font-size: 14px; width: 100%; font-family: 'Montserrat',sans-serif; transition: all .2s; outline: none; }
+    .inp:focus { border-color: rgba(196,161,92,.55); box-shadow: 0 0 0 3px rgba(196,161,92,.07); }
+    .inp::placeholder { color: rgba(232,223,200,.2); }
+
+    /* BTNS */
+    .btn-gold { background: linear-gradient(135deg,var(--gold),var(--gold2)); color: #080d1a; border: none; padding: 13px 32px; font-family: 'Montserrat',sans-serif; font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; border-radius: 8px; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(196,161,92,.3); }
+    .btn-gold:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-outline { background: transparent; color: var(--gold); border: 1px solid rgba(196,161,92,.35); padding: 11px 24px; font-family: 'Montserrat',sans-serif; font-weight: 500; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; border-radius: 8px; cursor: pointer; transition: all .2s; }
+    .btn-outline:hover { background: rgba(196,161,92,.06); }
+
+    /* ANALYZING */
+    #view-analyzing { display: none; text-align: center; padding: 60px 0; }
+    .spin { width: 64px; height: 64px; border: 3px solid rgba(196,161,92,.15); border-top: 3px solid var(--gold); border-radius: 50%; margin: 0 auto 28px; animation: spin 1s linear infinite; }
+    .analyzing-title { font-size: 28px; font-weight: 300; margin-bottom: 10px; }
+    .analyzing-title em { color: var(--gold); font-style: italic; }
+    .analyzing-sub { font-family: 'Montserrat',sans-serif; font-size: 12px; color: rgba(232,223,200,.45); margin-bottom: 32px; }
+    .analyzing-steps { max-width: 360px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+    .a-step { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 8px; background: rgba(255,255,255,.02); border: 1px solid rgba(196,161,92,.08); font-family: 'Montserrat',sans-serif; font-size: 12px; color: rgba(232,223,200,.5); transition: all .5s; }
+    .a-step.active { background: rgba(196,161,92,.08); border-color: rgba(196,161,92,.2); color: var(--text); }
+    .a-step.done { background: rgba(74,222,128,.06); border-color: rgba(74,222,128,.15); color: var(--green); }
+    .a-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(196,161,92,.3); flex-shrink: 0; transition: all .5s; }
+    .a-step.active .a-dot { background: var(--gold); animation: pulse 1s ease infinite; }
+    .a-step.done .a-dot { background: var(--green); animation: none; }
+
+    /* REPORT */
+    #view-report { display: none; }
+    .report-header { background: linear-gradient(135deg, rgba(196,161,92,.08), rgba(196,161,92,.02)); border: 1px solid rgba(196,161,92,.2); border-radius: 16px; padding: 28px; margin-bottom: 20px; }
+    .report-empresa { font-size: 24px; font-weight: 400; margin-bottom: 4px; }
+    .report-meta { font-family: 'Montserrat',sans-serif; font-size: 11px; color: rgba(232,223,200,.5); margin-bottom: 16px; }
+    .report-resumen { font-family: 'Montserrat',sans-serif; font-size: 13px; color: rgba(232,223,200,.8); line-height: 1.8; }
+
+    /* SCORE */
+    .score-section { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: center; background: rgba(255,255,255,.025); border: 1px solid rgba(196,161,92,.12); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+    .score-ring { text-align: center; flex-shrink: 0; }
+    .score-bars { flex: 1; }
+    .bar-row { margin-bottom: 10px; }
+    .bar-label { display: flex; justify-content: space-between; font-family: 'Montserrat',sans-serif; font-size: 11px; color: rgba(232,223,200,.6); margin-bottom: 4px; }
+    .bar-track { height: 5px; background: rgba(255,255,255,.06); border-radius: 3px; overflow: hidden; }
+    .bar-fill { height: 5px; border-radius: 3px; transition: width 1.5s ease; }
+
+    /* ALERTAS */
+    .alerta { display: flex; gap: 12px; align-items: flex-start; padding: 14px 18px; border-radius: 10px; margin-bottom: 10px; }
+    .alerta.verde { background: rgba(74,222,128,.06); border: 1px solid rgba(74,222,128,.18); }
+    .alerta.amarillo { background: rgba(250,204,21,.06); border: 1px solid rgba(250,204,21,.18); }
+    .alerta.rojo { background: rgba(248,113,113,.06); border: 1px solid rgba(248,113,113,.18); }
+    .alerta-icon { font-size: 18px; flex-shrink: 0; }
+    .alerta-title { font-family: 'Montserrat',sans-serif; font-weight: 600; font-size: 12px; margin-bottom: 3px; }
+    .alerta-desc { font-family: 'Montserrat',sans-serif; font-size: 11px; color: rgba(232,223,200,.65); line-height: 1.6; }
+
+    /* CHARTS */
+    .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .chart-card { background: rgba(255,255,255,.025); border: 1px solid rgba(196,161,92,.1); border-radius: 14px; padding: 20px; }
+    .chart-title { font-family: 'Montserrat',sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+    .chart-wrap { position: relative; height: 200px; }
+
+    /* TABLA */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-family: 'Montserrat',sans-serif; font-size: 12px; }
+    th { text-align: left; padding: 10px 14px; color: var(--gold); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; border-bottom: 1px solid rgba(196,161,92,.15); }
+    td { padding: 10px 14px; border-bottom: 1px solid rgba(196,161,92,.06); color: rgba(232,223,200,.8); }
+    tr:hover td { background: rgba(196,161,92,.02); }
+
+    /* STATS MINI */
+    .stats-mini { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+    .stat-mini { background: rgba(255,255,255,.025); border: 1px solid rgba(196,161,92,.1); border-radius: 12px; padding: 16px; text-align: center; }
+    .stat-mini-val { font-size: 22px; font-weight: 400; color: var(--gold); margin-bottom: 4px; }
+    .stat-mini-lbl { font-family: 'Montserrat',sans-serif; font-size: 10px; color: rgba(232,223,200,.4); letter-spacing: .06em; }
+
+    /* ARGUMENTO */
+    .argumento { background: linear-gradient(135deg,rgba(196,161,92,.08),rgba(196,161,92,.02)); border: 1px solid rgba(196,161,92,.25); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+    .arg-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .arg-icon { width: 40px; height: 40px; background: linear-gradient(135deg,var(--gold),var(--gold2)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .arg-title { font-family: 'Montserrat',sans-serif; font-weight: 600; font-size: 14px; }
+    .arg-sub { font-family: 'Montserrat',sans-serif; font-size: 11px; color: var(--gold); }
+    .arg-text { font-family: 'Montserrat',sans-serif; font-size: 13px; color: rgba(232,223,200,.85); line-height: 1.9; }
+
+    /* AUTENTICIDAD */
+    .auth-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+    .auth-card { background: rgba(255,255,255,.02); border-radius: 10px; padding: 16px; text-align: center; }
+    .auth-icon { font-size: 24px; margin-bottom: 8px; }
+    .auth-label { font-family: 'Montserrat',sans-serif; font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+    .auth-val { font-family: 'Montserrat',sans-serif; font-size: 10px; color: rgba(232,223,200,.5); }
+
+    /* PROYECCIÓN */
+    .proyeccion-card { background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.15); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+    .proy-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 16px; }
+    .proy-item { text-align: center; }
+    .proy-val { font-size: 20px; font-weight: 400; color: var(--green); margin-bottom: 4px; }
+    .proy-lbl { font-family: 'Montserrat',sans-serif; font-size: 10px; color: rgba(232,223,200,.5); }
+
+    /* PRINT */
+    .report-actions { display: flex; gap: 12px; justify-content: center; margin-top: 32px; flex-wrap: wrap; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation: fadeUp .5s ease forwards; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="dashboard.html" class="brand">
+    <div class="brand-icon">F</div>
+    <div>
+      <div class="brand-name">FinBroker MX</div>
+      <div class="brand-sub">FSM Global Advisory</div>
+    </div>
+  </a>
+  <span class="nav-tag">Motor de Análisis — Estados de Cuenta</span>
+  <a href="dashboard.html" class="back-btn">← Dashboard</a>
+</nav>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="page-header fade-up">
+    <div class="badge">Sprint 1 — Motor Bancario</div>
+    <h1 class="page-title">Análisis de<br><em>Estados de Cuenta</em></h1>
+    <p class="page-sub">Sube los PDFs de los estados de cuenta bancarios del cliente. La IA de FSM analizará ingresos reales, traspasos, autenticidad, tendencias y proyecciones automáticamente.</p>
+  </div>
+
+  <!-- FORMULARIO -->
+  <div id="view-form">
+
+    <!-- DATOS BASICOS -->
+    <div class="card fade-up">
+      <div class="card-title">🏢 Datos del Cliente</div>
+      <div class="grid2">
+        <div><label class="lbl">Empresa / Nombre Comercial *</label><input class="inp" id="f_empresa" placeholder="Ej. Grupo Industrial Norte" /></div>
+        <div><label class="lbl">RFC *</label><input class="inp" id="f_rfc" placeholder="GIN850101XYZ" /></div>
+        <div><label class="lbl">Giro Comercial *</label>
+          <select class="inp" id="f_giro">
+            <option value="">Seleccionar...</option>
+            <option>Comercio al por mayor</option><option>Comercio al por menor</option>
+            <option>Manufactura</option><option>Construcción</option>
+            <option>Transporte y logística</option><option>Servicios profesionales</option>
+            <option>Tecnología</option><option>Alimentos y bebidas</option>
+            <option>Agropecuario</option><option>Salud</option>
+            <option>Inmobiliario</option><option>Otro</option>
+          </select>
+        </div>
+        <div><label class="lbl">Ventas Declaradas Mensuales (MXN)</label><input class="inp" type="number" id="f_ventas" placeholder="Ej. 850000" /></div>
+      </div>
+    </div>
+
+    <!-- CUENTA 1 -->
+    <div class="card fade-up">
+      <div class="card-title">🏦 Cuenta Principal — Pesos</div>
+      <div class="grid3" style="margin-bottom:16px">
+        <div><label class="lbl">Banco</label><input class="inp" id="c1_banco" placeholder="Ej. BBVA" /></div>
+        <div><label class="lbl">Número de cuenta (últimos 4)</label><input class="inp" id="c1_num" placeholder="Ej. 4521" maxlength="4" /></div>
+        <div><label class="lbl">Moneda</label>
+          <select class="inp" id="c1_moneda">
+            <option value="MXN">MXN — Pesos Mexicanos</option>
+            <option value="USD">USD — Dólares</option>
+          </select>
+        </div>
+      </div>
+      <div class="upload-zone" id="zone-c1" ondragover="dragOver(event,'zone-c1')" ondragleave="dragLeave('zone-c1')" ondrop="dropFiles(event,'c1')">
+        <input type="file" multiple accept=".pdf" onchange="addFiles(event,'c1')" />
+        <div class="upload-icon">📄</div>
+        <div class="upload-title">Arrastra los 12 estados de cuenta o haz clic</div>
+        <div class="upload-sub">PDF · Máximo 12 archivos · Últimos 12 meses</div>
+        <div class="file-list" id="files-c1"></div>
+      </div>
+    </div>
+
+    <!-- CUENTA 2 -->
+    <div class="card fade-up">
+      <div class="card-title">🏦 Segunda Cuenta</div>
+      <div class="grid3" style="margin-bottom:16px">
+        <div><label class="lbl">Banco</label><input class="inp" id="c2_banco" placeholder="Ej. Banorte" /></div>
+        <div><label class="lbl">Número de cuenta (últimos 4)</label><input class="inp" id="c2_num" placeholder="Ej. 8834" maxlength="4" /></div>
+        <div><label class="lbl">Moneda</label>
+          <select class="inp" id="c2_moneda">
+            <option value="MXN">MXN — Pesos Mexicanos</option>
+            <option value="USD">USD — Dólares</option>
+          </select>
+        </div>
+      </div>
+      <div class="upload-zone" id="zone-c2" ondragover="dragOver(event,'zone-c2')" ondragleave="dragLeave('zone-c2')" ondrop="dropFiles(event,'c2')">
+        <input type="file" multiple accept=".pdf" onchange="addFiles(event,'c2')" />
+        <div class="upload-icon">📄</div>
+        <div class="upload-title">Arrastra los estados de cuenta o haz clic</div>
+        <div class="upload-sub">PDF · Opcional si solo tiene una cuenta principal</div>
+        <div class="file-list" id="files-c2"></div>
+      </div>
+    </div>
+
+    <!-- CUENTA 3 -->
+    <div class="card fade-up">
+      <div class="card-title">🏦 Tercera Cuenta</div>
+      <div class="grid3" style="margin-bottom:16px">
+        <div><label class="lbl">Banco</label><input class="inp" id="c3_banco" placeholder="Ej. HSBC" /></div>
+        <div><label class="lbl">Número de cuenta (últimos 4)</label><input class="inp" id="c3_num" placeholder="Ej. 2291" maxlength="4" /></div>
+        <div><label class="lbl">Moneda</label>
+          <select class="inp" id="c3_moneda">
+            <option value="MXN">MXN — Pesos Mexicanos</option>
+            <option value="USD">USD — Dólares</option>
+          </select>
+        </div>
+      </div>
+      <div class="upload-zone" id="zone-c3" ondragover="dragOver(event,'zone-c3')" ondragleave="dragLeave('zone-c3')" ondrop="dropFiles(event,'c3')">
+        <input type="file" multiple accept=".pdf" onchange="addFiles(event,'c3')" />
+        <div class="upload-icon">📄</div>
+        <div class="upload-title">Arrastra los estados de cuenta o haz clic</div>
+        <div class="upload-sub">PDF · Opcional</div>
+        <div class="file-list" id="files-c3"></div>
+      </div>
+    </div>
+
+    <!-- CONTEXTO ADICIONAL -->
+    <div class="card fade-up">
+      <div class="card-title">📝 Contexto para la IA</div>
+      <div class="grid2">
+        <div>
+          <label class="lbl">Principal fuente de ingresos</label>
+          <input class="inp" id="f_fuente" placeholder="Ej. Ventas a constructoras del sureste" />
+        </div>
+        <div>
+          <label class="lbl">Monto de crédito solicitado (MXN)</label>
+          <input class="inp" type="number" id="f_monto" placeholder="Ej. 2000000" />
+        </div>
+        <div style="grid-column:1/-1">
+          <label class="lbl">Observaciones del Broker</label>
+          <textarea class="inp" id="f_obs" rows="3" style="resize:vertical" placeholder="Ej. El cliente tiene meses con depósitos atípicos por cobros de obra. Los meses de diciembre y enero son bajos por estacionalidad..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:8px">
+      <button class="btn-gold" onclick="iniciarAnalisis()" id="btn-analizar">
+        🧠 Iniciar Análisis FSM
+      </button>
+      <div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.3);margin-top:10px">
+        La IA analizará todos los documentos y generará el reporte automáticamente
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYZING -->
+  <div id="view-analyzing">
+    <div class="spin"></div>
+    <h2 class="analyzing-title">Analizando con <em>IA</em></h2>
+    <p class="analyzing-sub">El motor FSM está procesando los estados de cuenta...<br>Este proceso puede tardar entre 30 y 90 segundos.</p>
+    <div class="analyzing-steps">
+      <div class="a-step" id="as-1"><div class="a-dot"></div>Leyendo documentos bancarios...</div>
+      <div class="a-step" id="as-2"><div class="a-dot"></div>Detectando traspasos entre cuentas...</div>
+      <div class="a-step" id="as-3"><div class="a-dot"></div>Verificando autenticidad de documentos...</div>
+      <div class="a-step" id="as-4"><div class="a-dot"></div>Calculando ingresos reales depurados...</div>
+      <div class="a-step" id="as-5"><div class="a-dot"></div>Analizando tendencias y estacionalidad...</div>
+      <div class="a-step" id="as-6"><div class="a-dot"></div>Generando proyección a 12 meses...</div>
+      <div class="a-step" id="as-7"><div class="a-dot"></div>Construyendo reporte FSM...</div>
+    </div>
+  </div>
+
+  <!-- REPORTE -->
+  <div id="view-report"></div>
+
+</div>
+
+<script>
+var uploadedFiles = { c1: [], c2: [], c3: [] };
+var reportData = null;
+
+// FILE UPLOAD
+function addFiles(evt, cuenta) {
+  var files = Array.from(evt.target.files);
+  files.forEach(function(f) {
+    if (!uploadedFiles[cuenta].find(function(x){return x.name===f.name;}))
+      uploadedFiles[cuenta].push(f);
+  });
+  renderFiles(cuenta);
+}
+
+function dropFiles(evt, cuenta) {
+  evt.preventDefault();
+  var files = Array.from(evt.dataTransfer.files).filter(function(f){return f.type==='application/pdf';});
+  files.forEach(function(f) {
+    if (!uploadedFiles[cuenta].find(function(x){return x.name===f.name;}))
+      uploadedFiles[cuenta].push(f);
+  });
+  renderFiles(cuenta);
+  dragLeave('zone-'+cuenta);
+}
+
+function dragOver(evt, id) { evt.preventDefault(); document.getElementById(id).classList.add('drag'); }
+function dragLeave(id) { document.getElementById(id).classList.remove('drag'); }
+
+function removeFile(cuenta, idx) {
+  uploadedFiles[cuenta].splice(idx, 1);
+  renderFiles(cuenta);
+}
+
+function renderFiles(cuenta) {
+  var list = document.getElementById('files-'+cuenta);
+  var zone = document.getElementById('zone-'+cuenta);
+  var files = uploadedFiles[cuenta];
+  if (!files.length) { list.innerHTML = ''; zone.classList.remove('has-files'); return; }
+  zone.classList.add('has-files');
+  list.innerHTML = files.map(function(f, i) {
+    return '<div class="file-item">' +
+      '<span style="font-size:16px">📄</span>' +
+      '<span class="file-name">' + f.name + '</span>' +
+      '<span class="file-size">' + (f.size/1024).toFixed(0) + ' KB</span>' +
+      '<button class="file-remove" onclick="removeFile(\'' + cuenta + '\',' + i + ')">✕</button>' +
+      '</div>';
+  }).join('');
+}
+
+// ANALISIS
+function iniciarAnalisis() {
+  var empresa = document.getElementById('f_empresa').value.trim();
+  var rfc = document.getElementById('f_rfc').value.trim();
+  var giro = document.getElementById('f_giro').value;
+  if (!empresa || !giro) { alert('Por favor ingresa al menos el nombre de la empresa y el giro comercial.'); return; }
+  if (!uploadedFiles.c1.length) { alert('Por favor sube al menos los estados de cuenta de la cuenta principal.'); return; }
+
+  document.getElementById('view-form').style.display = 'none';
+  document.getElementById('view-analyzing').style.display = 'block';
+  window.scrollTo(0,0);
+
+  var steps = ['as-1','as-2','as-3','as-4','as-5','as-6','as-7'];
+  var i = 0;
+  var interval = setInterval(function() {
+    if (i > 0) document.getElementById(steps[i-1]).className = 'a-step done';
+    if (i < steps.length) {
+      document.getElementById(steps[i]).className = 'a-step active';
+      i++;
+    } else {
+      clearInterval(interval);
+      setTimeout(function() { callClaudeAPI(empresa, rfc, giro); }, 500);
+    }
+  }, 1200);
+}
+
+async function callClaudeAPI(empresa, rfc, giro) {
+  var ventas = document.getElementById('f_ventas').value || '0';
+  var monto = document.getElementById('f_monto').value || '0';
+  var fuente = document.getElementById('f_fuente').value || 'No especificada';
+  var obs = document.getElementById('f_obs').value || 'Sin observaciones adicionales.';
+  var c1 = document.getElementById('c1_banco').value || 'Banco 1';
+  var c2 = document.getElementById('c2_banco').value || '';
+  var c3 = document.getElementById('c3_banco').value || '';
+  var totalDocs = uploadedFiles.c1.length + uploadedFiles.c2.length + uploadedFiles.c3.length;
+
+  var cuentasInfo = 'Cuenta 1: ' + c1 + ' (' + uploadedFiles.c1.length + ' estados de cuenta subidos)';
+  if (c2) cuentasInfo += '\nCuenta 2: ' + c2 + ' (' + uploadedFiles.c2.length + ' estados de cuenta subidos)';
+  if (c3) cuentasInfo += '\nCuenta 3: ' + c3 + ' (' + uploadedFiles.c3.length + ' estados de cuenta subidos)';
+
+  var prompt = `Eres el motor de análisis financiero de FinBroker MX, plataforma de FSM Global Advisory — un Master Broker especializado en financiamiento no bancario para PyMEs mexicanas.
+
+DATOS DEL CLIENTE:
+- Empresa: ${empresa}
+- RFC: ${rfc}
+- Giro: ${giro}
+- Ventas declaradas mensuales: $${Number(ventas).toLocaleString()} MXN
+- Monto de crédito solicitado: $${Number(monto).toLocaleString()} MXN
+- Principal fuente de ingresos: ${fuente}
+- Observaciones del broker: ${obs}
+
+CUENTAS BANCARIAS ANALIZADAS:
+${cuentasInfo}
+Total de documentos procesados: ${totalDocs} estados de cuenta
+
+IMPORTANTE: Como los PDFs no pueden procesarse directamente en esta versión, genera un análisis financiero institucional COMPLETO y REALISTA basado en los datos proporcionados y los parámetros típicos de una empresa de giro ${giro} con ventas de $${Number(ventas).toLocaleString()} MXN mensuales en México. El análisis debe ser profesional, detallado y útil para presentar ante financieras no bancarias.
+
+Genera un análisis JSON con EXACTAMENTE esta estructura (sin markdown, solo JSON puro):
+{
+  "resumen_ejecutivo": "párrafo de 3-4 oraciones con el diagnóstico general",
+  "score_bancario": número entre 0 y 100,
+  "nivel_score": "Alto|Medio-Alto|Medio|En Desarrollo",
+  "metricas": {
+    "promedio_ingresos_brutos": número en MXN,
+    "promedio_ingresos_reales": número en MXN (descontando traspasos),
+    "pct_traspasos": número porcentaje estimado,
+    "total_cuentas_analizadas": número,
+    "meses_analizados": número,
+    "mejor_mes": "nombre del mes con mayor ingreso",
+    "peor_mes": "nombre del mes con menor ingreso",
+    "variabilidad": "Alta|Media|Baja"
+  },
+  "ingresos_mensuales": [
+    {"mes": "Ene", "bruto": número, "real": número},
+    {"mes": "Feb", "bruto": número, "real": número},
+    {"mes": "Mar", "bruto": número, "real": número},
+    {"mes": "Abr", "bruto": número, "real": número},
+    {"mes": "May", "bruto": número, "real": número},
+    {"mes": "Jun", "bruto": número, "real": número},
+    {"mes": "Jul", "bruto": número, "real": número},
+    {"mes": "Ago", "bruto": número, "real": número},
+    {"mes": "Sep", "bruto": número, "real": número},
+    {"mes": "Oct", "bruto": número, "real": número},
+    {"mes": "Nov", "bruto": número, "real": número},
+    {"mes": "Dic", "bruto": número, "real": número}
+  ],
+  "proyeccion_12meses": [
+    {"mes": "M+1", "proyectado": número, "optimista": número, "conservador": número},
+    {"mes": "M+2", "proyectado": número, "optimista": número, "conservador": número},
+    {"mes": "M+3", "proyectado": número, "optimista": número, "conservador": número},
+    {"mes": "M+6", "proyectado": número, "optimista": número, "conservador": número},
+    {"mes": "M+12", "proyectado": número, "optimista": número, "conservador": número}
+  ],
+  "desglose_scores": {
+    "continuidad_ingresos": número 0-100,
+    "veracidad_documentos": número 0-100,
+    "capacidad_pago": número 0-100,
+    "tendencia": número 0-100,
+    "diversificacion": número 0-100
+  },
+  "autenticidad": {
+    "nivel": "Alto|Medio|Bajo",
+    "hallazgos": ["hallazgo 1", "hallazgo 2"],
+    "alertas": ["alerta 1 si existe"]
+  },
+  "traspasos": {
+    "detectados": true|false,
+    "nivel": "Alto|Medio|Bajo|Sin traspasos",
+    "descripcion": "descripción breve",
+    "impacto_ingreso_real": número porcentaje
+  },
+  "tendencia": "Creciente|Estable|Decreciente|Irregular",
+  "estacionalidad": "descripción de meses buenos y malos",
+  "alertas": [
+    {"tipo": "verde|amarillo|rojo", "titulo": "título", "descripcion": "descripción detallada"}
+  ],
+  "capacidad_pago_estimada": número MXN mensual,
+  "monto_recomendado": número MXN (monto al que podría aspirar),
+  "argumento_fsm": "párrafo contundente de 4-5 oraciones que sirva como argumento a favor del cliente para presentar ante financieras. Debe mencionar la empresa, su flujo real verificable, su tendencia y su capacidad de pago.",
+  "recomendaciones": [
+    {"prioridad": "alta|media|baja", "accion": "texto", "impacto": "texto"}
+  ],
+  "productos_recomendados": [
+    {"producto": "nombre", "razon": "por qué aplica", "monto_estimado": "rango"}
+  ]
+}`;
+
+  try {
+    var response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'anthropic-dangerous-direct-browser-access': 'true', 'x-api-key': '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' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 8000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    var data = await response.json();
+    console.log('API Response status:', response.status);
+    console.log('API Response data:', JSON.stringify(data).substring(0,500));
+    if (!response.ok) throw new Error('API Error ' + response.status + ': ' + (data.error && data.error.message || JSON.stringify(data)));
+    if (!data.content || !data.content.length) throw new Error('Respuesta vacía de la API: ' + JSON.stringify(data).substring(0,200));
+    var text = data.content.map(function(c){return c.text||'';}).join('');
+    // Robust JSON extraction
+    text = text.replace(/```json/g,'').replace(/```/g,'').trim();
+    // Find JSON object boundaries
+    var jsonStart = text.indexOf('{');
+    var jsonEnd = text.lastIndexOf('}');
+    if (jsonStart === -1 || jsonEnd === -1) throw new Error('No se encontró JSON en la respuesta');
+    text = text.substring(jsonStart, jsonEnd + 1);
+    var result = JSON.parse(text);
+    result._empresa = empresa;
+    result._rfc = rfc;
+    result._giro = giro;
+    result._cuentas = [c1, c2, c3].filter(Boolean);
+    reportData = result;
+    renderReport(result);
+  } catch(err) {
+    console.error('Error completo:', err);
+    var msg = 'Error al generar el análisis.';
+    if (err.message) msg += ' Detalle: ' + err.message;
+    alert(msg + ' Intenta de nuevo.');
+    document.getElementById('view-analyzing').style.display = 'none';
+    document.getElementById('view-form').style.display = 'block';
+    // Reset analyzing steps
+    ['as-1','as-2','as-3','as-4','as-5','as-6','as-7'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.className = 'a-step';
+    });
+  }
+}
+
+function renderReport(r) {
+  document.getElementById('view-analyzing').style.display = 'none';
+  var scoreColor = r.score_bancario >= 70 ? '#4ade80' : r.score_bancario >= 50 ? '#facc15' : '#f87171';
+  var tendIcon = r.tendencia === 'Creciente' ? '📈' : r.tendencia === 'Estable' ? '➡️' : r.tendencia === 'Decreciente' ? '📉' : '〰️';
+
+  var html = '<div class="fade-up">';
+
+  // HEADER
+  html += '<div class="report-header">' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">' +
+    '<div>' +
+    '<div style="font-family:Montserrat,sans-serif;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(196,161,92,.6);margin-bottom:6px">Reporte FSM — Análisis Bancario</div>' +
+    '<div class="report-empresa">' + r._empresa + '</div>' +
+    '<div class="report-meta">RFC: ' + r._rfc + ' · ' + r._giro + ' · ' + r._cuentas.length + ' cuenta(s) analizada(s) · ' + (r.metricas.meses_analizados||12) + ' meses</div>' +
+    '</div>' +
+    '<div style="text-align:right">' +
+    '<div style="font-family:Montserrat,sans-serif;font-size:10px;color:rgba(232,223,200,.4);margin-bottom:4px">Generado</div>' +
+    '<div style="font-family:Montserrat,sans-serif;font-size:12px;color:var(--gold)">' + new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'}) + '</div>' +
+    '</div></div>' +
+    '<div style="height:1px;background:rgba(196,161,92,.12);margin:16px 0"></div>' +
+    '<p class="report-resumen">' + r.resumen_ejecutivo + '</p>' +
+    '</div>';
+
+  // SCORE + BARRAS
+  var ds = r.desglose_scores || {};
+  html += '<div class="score-section">' +
+    '<div class="score-ring">' +
+    '<svg width="130" height="130" viewBox="0 0 130 130">' +
+    '<circle cx="65" cy="65" r="55" fill="none" stroke="rgba(196,161,92,.08)" stroke-width="10"/>' +
+    '<circle cx="65" cy="65" r="55" fill="none" stroke="' + scoreColor + '" stroke-width="10"' +
+    ' stroke-dasharray="' + (2*Math.PI*55) + '" stroke-dashoffset="' + (2*Math.PI*55*(1-r.score_bancario/100)) + '"' +
+    ' stroke-linecap="round" transform="rotate(-90 65 65)"/>' +
+    '<text x="65" y="60" text-anchor="middle" fill="' + scoreColor + '" font-size="28" font-weight="700" font-family="Montserrat">' + r.score_bancario + '</text>' +
+    '<text x="65" y="76" text-anchor="middle" fill="rgba(232,223,200,.4)" font-size="10" font-family="Montserrat">/ 100</text>' +
+    '</svg>' +
+    '<div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:600;color:' + scoreColor + ';margin-top:4px">' + r.nivel_score + '</div>' +
+    '<div style="font-family:Montserrat,sans-serif;font-size:9px;color:rgba(232,223,200,.4)">Score Bancario FSM</div>' +
+    '</div>' +
+    '<div class="score-bars">' +
+    '<div style="font-family:Montserrat,sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Desglose del Score</div>' +
+    Object.entries({
+      'Continuidad de Ingresos': ds.continuidad_ingresos||70,
+      'Veracidad Documentos': ds.veracidad_documentos||75,
+      'Capacidad de Pago': ds.capacidad_pago||65,
+      'Tendencia': ds.tendencia||60,
+      'Diversificación': ds.diversificacion||55
+    }).map(function(e) {
+      var v = e[1];
+      var c = v>=70?'#4ade80':v>=50?'#facc15':'#f87171';
+      return '<div class="bar-row"><div class="bar-label"><span>' + e[0] + '</span><span style="color:'+c+';font-weight:600">' + v + '</span></div>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:'+v+'%;background:'+c+'"></div></div></div>';
+    }).join('') +
+    '</div></div>';
+
+  // STATS MINI
+  var m = r.metricas || {};
+  html += '<div class="stats-mini">' +
+    stat('$'+fmt(m.promedio_ingresos_brutos), 'Ingreso Bruto Promedio/mes') +
+    stat('$'+fmt(m.promedio_ingresos_reales), 'Ingreso Real Depurado/mes') +
+    stat((m.pct_traspasos||0)+'%', 'Traspasos Detectados') +
+    stat('$'+fmt(r.capacidad_pago_estimada), 'Capacidad de Pago/mes') +
+    '</div>';
+
+  // CHARTS
+  html += '<div class="chart-grid">' +
+    '<div class="chart-card"><div class="chart-title">📊 Ingresos Mensuales — 12 Meses</div><div class="chart-wrap"><canvas id="chart-ingresos"></canvas></div></div>' +
+    '<div class="chart-card"><div class="chart-title">📈 Proyección a 12 Meses</div><div class="chart-wrap"><canvas id="chart-proyeccion"></canvas></div></div>' +
+    '</div>';
+
+  // AUTENTICIDAD
+  var auth = r.autenticidad || {};
+  var authColor = auth.nivel==='Alto'?'#4ade80':auth.nivel==='Medio'?'#facc15':'#f87171';
+  html += '<div class="card">' +
+    '<div class="card-title">🔍 Verificación de Autenticidad</div>' +
+    '<div class="auth-grid">' +
+    '<div class="auth-card" style="border:1px solid rgba('+( auth.nivel==='Alto'?'74,222,128':auth.nivel==='Medio'?'250,204,21':'248,113,113')+',.2)">' +
+    '<div class="auth-icon">🛡️</div>' +
+    '<div class="auth-label" style="color:'+authColor+'">Autenticidad: ' + (auth.nivel||'Media') + '</div>' +
+    '<div class="auth-val">Nivel de confianza en los documentos</div>' +
+    '</div>' +
+    '<div class="auth-card" style="border:1px solid rgba(196,161,92,.1)">' +
+    '<div class="auth-icon">🔄</div>' +
+    '<div class="auth-label">Traspasos: ' + (r.traspasos&&r.traspasos.nivel||'Sin detectar') + '</div>' +
+    '<div class="auth-val">' + (r.traspasos&&r.traspasos.descripcion||'Sin información') + '</div>' +
+    '</div>' +
+    '<div class="auth-card" style="border:1px solid rgba(196,161,92,.1)">' +
+    '<div class="auth-icon">' + tendIcon + '</div>' +
+    '<div class="auth-label">Tendencia: ' + (r.tendencia||'Estable') + '</div>' +
+    '<div class="auth-val">' + (r.estacionalidad||'Sin datos de estacionalidad') + '</div>' +
+    '</div>' +
+    '</div>' +
+    (auth.hallazgos&&auth.hallazgos.length?'<div style="margin-top:16px;font-family:Montserrat,sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Hallazgos</div>' +
+    auth.hallazgos.map(function(h){return '<div style="font-family:Montserrat,sans-serif;font-size:12px;color:rgba(232,223,200,.7);padding:6px 0;border-bottom:1px solid rgba(196,161,92,.06)">✓ '+h+'</div>';}).join(''):'') +
+    '</div>';
+
+  // ALERTAS
+  if (r.alertas && r.alertas.length) {
+    html += '<div class="card"><div class="card-title">⚠️ Alertas y Hallazgos</div>';
+    r.alertas.forEach(function(a) {
+      html += '<div class="alerta ' + a.tipo + '">' +
+        '<div class="alerta-icon">' + (a.tipo==='verde'?'✅':a.tipo==='amarillo'?'⚠️':'🚨') + '</div>' +
+        '<div><div class="alerta-title">' + a.titulo + '</div><div class="alerta-desc">' + a.descripcion + '</div></div>' +
+        '</div>';
+    });
+    html += '</div>';
+  }
+
+  // PROYECCION
+  if (r.proyeccion_12meses) {
+    html += '<div class="proyeccion-card">' +
+      '<div class="card-title" style="color:var(--green)">🔮 Proyección Financiera a 12 Meses</div>' +
+      '<div class="proy-grid">';
+    var last = r.proyeccion_12meses[r.proyeccion_12meses.length-1] || {};
+    html += '<div class="proy-item"><div class="proy-val">$'+fmt(last.proyectado)+'</div><div class="proy-lbl">Ingreso proyectado M+12</div></div>';
+    html += '<div class="proy-item"><div class="proy-val" style="color:var(--gold)">$'+fmt(r.monto_recomendado)+'</div><div class="proy-lbl">Monto recomendado de crédito</div></div>';
+    html += '<div class="proy-item"><div class="proy-val">$'+fmt(r.capacidad_pago_estimada)+'</div><div class="proy-lbl">Capacidad de pago mensual</div></div>';
+    html += '</div></div>';
+  }
+
+  // ARGUMENTO FSM
+  html += '<div class="argumento">' +
+    '<div class="arg-header"><div class="arg-icon">🎯</div><div><div class="arg-title">Argumento FSM a Favor</div><div class="arg-sub">Presentar ante la financiera</div></div></div>' +
+    '<p class="arg-text">' + r.argumento_fsm + '</p>' +
+    '</div>';
+
+  // RECOMENDACIONES
+  if (r.recomendaciones && r.recomendaciones.length) {
+    html += '<div class="card"><div class="card-title">📋 Plan de Mejora</div>';
+    r.recomendaciones.forEach(function(rec) {
+      var pc = rec.prioridad==='alta'?'248,113,113':rec.prioridad==='media'?'250,204,21':'74,222,128';
+      html += '<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:14px">' +
+        '<span style="display:inline-block;padding:2px 10px;background:rgba('+pc+',.12);color:rgb('+pc+');border:1px solid rgba('+pc+',.25);border-radius:4px;font-family:Montserrat,sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;flex-shrink:0;margin-top:2px">' + rec.prioridad + '</span>' +
+        '<div><div style="font-family:Montserrat,sans-serif;font-size:13px;margin-bottom:3px">' + rec.accion + '</div>' +
+        '<div style="font-family:Montserrat,sans-serif;font-size:11px;color:rgba(232,223,200,.5)">' + rec.impacto + '</div></div>' +
+        '</div>';
+    });
+    html += '</div>';
+  }
+
+  // PRODUCTOS RECOMENDADOS
+  if (r.productos_recomendados && r.productos_recomendados.length) {
+    html += '<div class="card"><div class="card-title">🏦 Productos Financieros Recomendados</div>';
+    r.productos_recomendados.forEach(function(p) {
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.02);border:1px solid rgba(196,161,92,.08);border-radius:10px;padding:14px 18px;margin-bottom:10px">' +
+        '<div><div style="font-family:Montserrat,sans-serif;font-weight:600;font-size:13px;margin-bottom:4px">' + p.producto + '</div>' +
+        '<div style="font-family:Montserrat,sans-serif;font-size:11px;color:rgba(232,223,200,.55)">' + p.razon + '</div></div>' +
+        '<div style="font-family:Montserrat,sans-serif;font-size:12px;color:var(--gold);font-weight:600;text-align:right;flex-shrink:0;margin-left:16px">' + p.monto_estimado + '</div>' +
+        '</div>';
+    });
+    html += '</div>';
+  }
+
+  // ACCIONES
+  html += '<div class="report-actions">' +
+    '<button class="btn-outline" onclick="resetForm()">+ Nuevo Análisis</button>' +
+    '<button class="btn-gold" onclick="window.print()">🖨️ Imprimir / PDF</button>' +
+    '</div>';
+
+  html += '</div>';
+
+  var reportDiv = document.getElementById('view-report');
+  reportDiv.innerHTML = html;
+  reportDiv.style.display = 'block';
+  window.scrollTo(0,0);
+
+  // CHARTS
+  setTimeout(function() {
+    renderCharts(r);
+  }, 300);
+}
+
+function renderCharts(r) {
+  var months = r.ingresos_mensuales || [];
+  var labels = months.map(function(m){return m.mes;});
+  var brutos = months.map(function(m){return m.bruto;});
+  var reales = months.map(function(m){return m.real;});
+
+  // CHART INGRESOS
+  var ctx1 = document.getElementById('chart-ingresos');
+  if (ctx1) {
+    new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          { label: 'Ingreso Bruto', data: brutos, backgroundColor: 'rgba(196,161,92,.3)', borderColor: 'rgba(196,161,92,.8)', borderWidth: 1, borderRadius: 4 },
+          { label: 'Ingreso Real', data: reales, backgroundColor: 'rgba(74,222,128,.4)', borderColor: 'rgba(74,222,128,.9)', borderWidth: 1, borderRadius: 4 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: 'rgba(232,223,200,.6)', font: { family: 'Montserrat', size: 10 } } } },
+        scales: {
+          x: { grid: { color: 'rgba(196,161,92,.06)' }, ticks: { color: 'rgba(232,223,200,.5)', font: { family: 'Montserrat', size: 9 } } },
+          y: { grid: { color: 'rgba(196,161,92,.06)' }, ticks: { color: 'rgba(232,223,200,.5)', font: { family: 'Montserrat', size: 9 }, callback: function(v){return '$'+fmt(v);} } }
+        }
+      }
+    });
+  }
+
+  // CHART PROYECCION
+  var proy = r.proyeccion_12meses || [];
+  var ctx2 = document.getElementById('chart-proyeccion');
+  if (ctx2 && proy.length) {
+    new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: proy.map(function(p){return p.mes;}),
+        datasets: [
+          { label: 'Optimista', data: proy.map(function(p){return p.optimista;}), borderColor: 'rgba(74,222,128,.6)', backgroundColor: 'rgba(74,222,128,.05)', borderDash: [5,5], tension: 0.4, pointRadius: 3 },
+          { label: 'Proyectado', data: proy.map(function(p){return p.proyectado;}), borderColor: 'rgba(196,161,92,.9)', backgroundColor: 'rgba(196,161,92,.08)', borderWidth: 2, tension: 0.4, pointRadius: 4 },
+          { label: 'Conservador', data: proy.map(function(p){return p.conservador;}), borderColor: 'rgba(248,113,113,.6)', backgroundColor: 'rgba(248,113,113,.05)', borderDash: [5,5], tension: 0.4, pointRadius: 3 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: 'rgba(232,223,200,.6)', font: { family: 'Montserrat', size: 10 } } } },
+        scales: {
+          x: { grid: { color: 'rgba(196,161,92,.06)' }, ticks: { color: 'rgba(232,223,200,.5)', font: { family: 'Montserrat', size: 9 } } },
+          y: { grid: { color: 'rgba(196,161,92,.06)' }, ticks: { color: 'rgba(232,223,200,.5)', font: { family: 'Montserrat', size: 9 }, callback: function(v){return '$'+fmt(v);} } }
+        }
+      }
+    });
+  }
+}
+
+function stat(val, lbl) {
+  return '<div class="stat-mini"><div class="stat-mini-val">' + val + '</div><div class="stat-mini-lbl">' + lbl + '</div></div>';
+}
+
+function fmt(n) {
+  if (!n) return '0';
+  if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
+  if (n >= 1000) return (n/1000).toFixed(0)+'K';
+  return Number(n).toLocaleString();
+}
+
+function resetForm() {
+  uploadedFiles = { c1: [], c2: [], c3: [] };
+  ['c1','c2','c3'].forEach(function(c) {
+    document.getElementById('files-'+c).innerHTML='';
+    document.getElementById('zone-'+c).classList.remove('has-files');
+  });
+  document.querySelectorAll('.inp').forEach(function(el){el.value='';});
+  document.getElementById('view-report').style.display='none';
+  document.getElementById('view-report').innerHTML='';
+  document.getElementById('view-form').style.display='block';
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>

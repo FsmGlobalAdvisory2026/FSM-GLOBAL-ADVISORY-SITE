@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — FinBroker MX | FSM Global Advisory</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --gold: #c4a15c; --gold2: #a8843e; --dark: #090e1c; --dark2: #0d1425; --text: #e8dfc8; --sidebar: 240px; }
+    body { background: var(--dark); color: var(--text); font-family: 'Cormorant Garamond', Georgia, serif; display: flex; min-height: 100vh; }
+    ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-thumb { background: rgba(196,161,92,.3); border-radius: 3px; }
+
+    /* SIDEBAR */
+    .sidebar { width: var(--sidebar); background: var(--dark2); border-right: 1px solid rgba(196,161,92,.08); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+    .sidebar-brand { padding: 24px 20px; border-bottom: 1px solid rgba(196,161,92,.08); display: flex; align-items: center; gap: 10px; }
+    .brand-icon { width: 32px; height: 32px; background: linear-gradient(135deg, var(--gold), var(--gold2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 14px; color: #080d1a; flex-shrink: 0; }
+    .brand-name { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 12px; line-height: 1.2; }
+    .brand-sub { font-family: 'Montserrat', sans-serif; font-size: 8px; color: var(--gold); letter-spacing: .15em; text-transform: uppercase; }
+    .sidebar-nav { flex: 1; padding: 16px 0; overflow-y: auto; }
+    .nav-section { padding: 0 12px; margin-bottom: 4px; }
+    .nav-label { font-family: 'Montserrat', sans-serif; font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: rgba(196,161,92,.4); padding: 12px 8px 6px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; cursor: pointer; transition: all .2s; margin-bottom: 2px; font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 500; color: rgba(232,223,200,.55); }
+    .nav-item:hover { background: rgba(196,161,92,.06); color: var(--text); }
+    .nav-item.active { background: rgba(196,161,92,.1); color: var(--gold); border: 1px solid rgba(196,161,92,.15); }
+    .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+    .nav-badge { margin-left: auto; background: var(--gold); color: #080d1a; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 10px; }
+    .sidebar-footer { padding: 16px 12px; border-top: 1px solid rgba(196,161,92,.08); }
+    .user-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; background: rgba(196,161,92,.05); border: 1px solid rgba(196,161,92,.1); }
+    .user-avatar { width: 32px; height: 32px; background: linear-gradient(135deg, var(--gold), var(--gold2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 12px; color: #080d1a; flex-shrink: 0; }
+    .user-name { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600; line-height: 1.2; }
+    .user-rol { font-family: 'Montserrat', sans-serif; font-size: 9px; color: var(--gold); letter-spacing: .08em; text-transform: uppercase; }
+    .logout-btn { margin-left: auto; background: transparent; border: none; color: rgba(232,223,200,.3); cursor: pointer; font-size: 14px; padding: 4px; transition: color .2s; }
+    .logout-btn:hover { color: #f87171; }
+
+    /* MAIN */
+    .main { margin-left: var(--sidebar); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { padding: 16px 32px; border-bottom: 1px solid rgba(196,161,92,.08); display: flex; align-items: center; justify-content: space-between; background: rgba(13,20,37,.5); backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 50; }
+    .page-title { font-size: 22px; font-weight: 400; }
+    .page-title span { color: var(--gold); font-style: italic; }
+    .topbar-actions { display: flex; gap: 10px; align-items: center; }
+    .btn-gold { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #080d1a; border: none; padding: 10px 20px; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; border-radius: 8px; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 6px; }
+    .btn-gold:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(196,161,92,.3); }
+    .content { padding: 32px; flex: 1; }
+
+    /* VIEWS */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* STATS */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    .stat-card { background: rgba(255,255,255,.025); border: 1px solid rgba(196,161,92,.1); border-radius: 14px; padding: 20px 24px; }
+    .stat-label { font-family: 'Montserrat', sans-serif; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: rgba(232,223,200,.45); margin-bottom: 8px; }
+    .stat-value { font-size: 32px; font-weight: 400; color: var(--gold); line-height: 1; margin-bottom: 4px; }
+    .stat-sub { font-family: 'Montserrat', sans-serif; font-size: 11px; color: rgba(232,223,200,.4); }
+
+    /* CRM PIPELINE */
+    .pipeline { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 32px; }
+    .pipeline-col { background: rgba(255,255,255,.02); border: 1px solid rgba(196,161,92,.08); border-radius: 12px; padding: 14px; min-height: 400px; }
+    .pipeline-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .pipeline-title { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    .pipeline-count { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; color: var(--gold); background: rgba(196,161,92,.1); border-radius: 10px; padding: 2px 8px; }
+    .caso-card { background: rgba(255,255,255,.035); border: 1px solid rgba(196,161,92,.1); border-radius: 10px; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: all .2s; }
+    .caso-card:hover { border-color: rgba(196,161,92,.3); background: rgba(196,161,92,.04); transform: translateY(-1px); }
+    .caso-empresa { font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+    .caso-monto { font-family: 'Montserrat', sans-serif; font-size: 11px; color: var(--gold); margin-bottom: 6px; }
+    .caso-meta { display: flex; justify-content: space-between; align-items: center; }
+    .caso-fecha { font-family: 'Montserrat', sans-serif; font-size: 10px; color: rgba(232,223,200,.35); }
+    .caso-tag { font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+    .empty-col { text-align: center; padding: 32px 12px; font-family: 'Montserrat', sans-serif; font-size: 11px; color: rgba(232,223,200,.2); line-height: 1.6; }
+
+    /* FORM NUEVO CASO */
+    .form-card { background: rgba(255,255,255,.025); border: 1px solid rgba(196,161,92,.12); border-radius: 16px; padding: 28px; margin-bottom: 20px; }
+    .form-section-title { font-family: 'Montserrat', sans-serif; font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .span2 { grid-column: 1 / -1; }
+    .lbl { font-family: 'Montserrat', sans-serif; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 6px; }
+    .inp { background: rgba(255,255,255,.04); border: 1px solid rgba(196,161,92,.18); border-radius: 8px; color: var(--text); padding: 10px 14px; font-size: 14px; width: 100%; font-family: 'Montserrat', sans-serif; transition: all .2s; outline: none; }
+    .inp:focus { border-color: rgba(196,161,92,.55); box-shadow: 0 0 0 3px rgba(196,161,92,.07); }
+    .inp::placeholder { color: rgba(232,223,200,.2); }
+    .form-group { margin-bottom: 0; }
+
+    /* CHECKLIST */
+    .checklist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .check-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(255,255,255,.02); border: 1px solid rgba(196,161,92,.08); border-radius: 8px; cursor: pointer; transition: all .2s; }
+    .check-item:hover { border-color: rgba(196,161,92,.2); }
+    .check-item.checked { background: rgba(74,222,128,.04); border-color: rgba(74,222,128,.2); }
+    .check-box { width: 18px; height: 18px; border: 1px solid rgba(196,161,92,.3); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .2s; }
+    .check-item.checked .check-box { background: #4ade80; border-color: #4ade80; }
+    .check-label { font-family: 'Montserrat', sans-serif; font-size: 11px; color: rgba(232,223,200,.7); line-height: 1.4; }
+    .check-item.checked .check-label { color: var(--text); }
+
+    /* STEPS NAV */
+    .steps-nav { display: flex; gap: 0; margin-bottom: 28px; background: rgba(255,255,255,.02); border: 1px solid rgba(196,161,92,.1); border-radius: 12px; overflow: hidden; }
+    .step-btn { flex: 1; padding: 12px 8px; text-align: center; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; transition: all .2s; color: rgba(232,223,200,.4); border-right: 1px solid rgba(196,161,92,.08); }
+    .step-btn:last-child { border-right: none; }
+    .step-btn.active { background: rgba(196,161,92,.1); color: var(--gold); }
+    .step-btn.done { color: #4ade80; }
+    .step-form { display: none; }
+    .step-form.active { display: block; }
+    .step-actions { display: flex; justify-content: space-between; margin-top: 24px; }
+    .btn-outline { background: transparent; color: var(--gold); border: 1px solid rgba(196,161,92,.35); padding: 10px 24px; font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; border-radius: 8px; cursor: pointer; transition: all .2s; }
+    .btn-outline:hover { background: rgba(196,161,92,.06); }
+
+    /* BADGE */
+    .status-badge { display: inline-block; padding: 3px 10px; border-radius: 4px; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 600; }
+
+    @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    .view.active { animation: fadeIn .4s ease forwards; }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">F</div>
+      <div>
+        <div class="brand-name">FinBroker MX</div>
+        <div class="brand-sub">FSM Global Advisory</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-label">Principal</div>
+        <div class="nav-item active" onclick="showView('dashboard')">
+          <span class="nav-icon">📊</span> Dashboard
+        </div>
+        <div class="nav-item" onclick="showView('nuevo-caso')">
+          <span class="nav-icon">➕</span> Nuevo Caso
+        </div>
+        <div class="nav-item" onclick="showView('crm')">
+          <span class="nav-icon">📁</span> Mis Casos
+          <span class="nav-badge" id="casos-badge">0</span>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Herramientas</div>
+        <div class="nav-item" onclick="showView('reporte')">
+          <span class="nav-icon">🧾</span> Reporte FSM
+        </div>
+        <div class="nav-item" onclick="showView('comisiones')">
+          <span class="nav-icon">💰</span> Comisiones
+        </div>
+        <div class="nav-item" onclick="showView('capacitaciones')">
+          <span class="nav-icon">📚</span> Capacitaciones
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Cuenta</div>
+        <div class="nav-item" onclick="showView('membresia')">
+          <span class="nav-icon">⭐</span> Membresía
+        </div>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar" id="user-avatar">F</div>
+        <div>
+          <div class="user-name" id="user-name">FSM Admin</div>
+          <div class="user-rol" id="user-rol">Administrador</div>
+        </div>
+        <button class="logout-btn" onclick="logout()" title="Cerrar sesión">⏻</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="page-title" id="page-title">Dashboard <span>FSM</span></div>
+      <div class="topbar-actions">
+        <button class="btn-gold" onclick="showView('nuevo-caso')">
+          ➕ Nuevo Caso
+        </button>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div id="view-dashboard" class="view active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Casos Totales</div>
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-sub">expedientes registrados</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">En Proceso</div>
+            <div class="stat-value" id="stat-proceso">0</div>
+            <div class="stat-sub">con financieras activas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Cerrados</div>
+            <div class="stat-value" id="stat-cerrados">0</div>
+            <div class="stat-sub">colocaciones exitosas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Comisión Estimada</div>
+            <div class="stat-value" id="stat-comision">$0</div>
+            <div class="stat-sub">MXN en pipeline</div>
+          </div>
+        </div>
+
+        <!-- PIPELINE RESUMEN -->
+        <div style="margin-bottom:16px">
+          <div style="font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Pipeline de Casos</div>
+        </div>
+        <div class="pipeline" id="pipeline-board">
+          <!-- Se llena dinámicamente -->
+        </div>
+
+        <!-- ACTIVIDAD RECIENTE -->
+        <div style="background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.1);border-radius:14px;padding:24px">
+          <div style="font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Actividad Reciente</div>
+          <div id="actividad-list" style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(232,223,200,.4);text-align:center;padding:32px 0">
+            Sin actividad registrada aún. ¡Agrega tu primer caso!
+          </div>
+        </div>
+      </div>
+
+      <!-- NUEVO CASO -->
+      <div id="view-nuevo-caso" class="view">
+        <div class="steps-nav">
+          <div class="step-btn active" id="step-btn-1" onclick="goStep(1)">1. Empresa</div>
+          <div class="step-btn" id="step-btn-2" onclick="goStep(2)">2. Documentos</div>
+          <div class="step-btn" id="step-btn-3" onclick="goStep(3)">3. CIEC & FSM</div>
+          <div class="step-btn" id="step-btn-4" onclick="goStep(4)">4. Financieras</div>
+        </div>
+
+        <!-- STEP 1: DATOS EMPRESA -->
+        <div class="step-form active" id="step-1">
+          <div class="form-card">
+            <div class="form-section-title">🏢 Datos Generales de la Empresa</div>
+            <div class="grid2">
+              <div class="form-group"><label class="lbl">Nombre Comercial *</label><input class="inp" id="nc_nombre_comercial" placeholder="Ej. Grupo Industrial Norte" /></div>
+              <div class="form-group"><label class="lbl">Razón Social *</label><input class="inp" id="nc_razon_social" placeholder="Ej. Grupo Industrial Norte S.A. de C.V." /></div>
+              <div class="form-group"><label class="lbl">RFC *</label><input class="inp" id="nc_rfc" placeholder="GIN850101XYZ" /></div>
+              <div class="form-group"><label class="lbl">Página Web</label><input class="inp" id="nc_web" placeholder="www.empresa.com" /></div>
+              <div class="form-group"><label class="lbl">Giro Comercial *</label>
+                <select class="inp" id="nc_giro">
+                  <option value="">Seleccionar...</option>
+                  <option>Comercio al por mayor</option><option>Comercio al por menor</option>
+                  <option>Manufactura</option><option>Construcción</option>
+                  <option>Transporte y logística</option><option>Servicios profesionales</option>
+                  <option>Tecnología</option><option>Alimentos y bebidas</option>
+                  <option>Agropecuario</option><option>Salud</option>
+                  <option>Educación</option><option>Turismo</option><option>Inmobiliario</option><option>Otro</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="lbl">Antigüedad (años) *</label><input class="inp" type="number" id="nc_antiguedad" placeholder="Ej. 5" min="0" /></div>
+              <div class="form-group"><label class="lbl">Número de Empleados</label><input class="inp" type="number" id="nc_empleados" placeholder="Ej. 25" /></div>
+              <div class="form-group"><label class="lbl">Estado / Ciudad *</label><input class="inp" id="nc_ubicacion" placeholder="Ej. Tuxtla Gutiérrez, Chiapas" /></div>
+              <div class="form-group"><label class="lbl">Ventas Mensuales Aprox. (MXN) *</label><input class="inp" type="number" id="nc_ventas" placeholder="Ej. 850000" /></div>
+              <div class="form-group"><label class="lbl">Monto Solicitado (MXN) *</label><input class="inp" type="number" id="nc_monto" placeholder="Ej. 1500000" /></div>
+              <div class="form-group"><label class="lbl">Destino del Crédito *</label>
+                <select class="inp" id="nc_destino">
+                  <option value="">Seleccionar...</option>
+                  <option value="capital_trabajo">Capital de trabajo</option>
+                  <option value="equipo">Equipo / Maquinaria</option>
+                  <option value="expansion">Expansión</option>
+                  <option value="inmueble">Adquisición de inmueble</option>
+                  <option value="refinanciamiento">Refinanciamiento</option>
+                  <option value="tecnologia">Tecnología</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="lbl">Plazo Deseado</label>
+                <select class="inp" id="nc_plazo">
+                  <option value="">Seleccionar...</option>
+                  <option value="12">12 meses</option><option value="24">24 meses</option>
+                  <option value="36">36 meses</option><option value="48">48 meses</option>
+                  <option value="60">60 meses</option><option value="mas">Más de 60 meses</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-card">
+            <div class="form-section-title">👥 Principales Clientes</div>
+            <div class="grid3">
+              <div class="form-group"><label class="lbl">Cliente 1</label><input class="inp" id="nc_cliente1" placeholder="Nombre / Giro" /></div>
+              <div class="form-group"><label class="lbl">Cliente 2</label><input class="inp" id="nc_cliente2" placeholder="Nombre / Giro" /></div>
+              <div class="form-group"><label class="lbl">Cliente 3</label><input class="inp" id="nc_cliente3" placeholder="Nombre / Giro" /></div>
+            </div>
+          </div>
+
+          <div class="form-card">
+            <div class="form-section-title">🏭 Principales Proveedores</div>
+            <div class="grid3">
+              <div class="form-group"><label class="lbl">Proveedor 1</label><input class="inp" id="nc_prov1" placeholder="Nombre / Giro" /></div>
+              <div class="form-group"><label class="lbl">Proveedor 2</label><input class="inp" id="nc_prov2" placeholder="Nombre / Giro" /></div>
+              <div class="form-group"><label class="lbl">Proveedor 3</label><input class="inp" id="nc_prov3" placeholder="Nombre / Giro" /></div>
+            </div>
+          </div>
+
+          <div class="form-card">
+            <div class="form-section-title">📋 Notas del Broker</div>
+            <textarea class="inp" id="nc_notas" rows="3" style="resize:vertical" placeholder="Contexto adicional, observaciones, puntos a destacar del cliente..."></textarea>
+          </div>
+
+          <div class="step-actions">
+            <button class="btn-outline" onclick="showView('dashboard')">Cancelar</button>
+            <button class="btn-gold" onclick="goStep(2)">Siguiente: Documentos →</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: DOCUMENTOS -->
+        <div class="step-form" id="step-2">
+          <div class="form-card">
+            <div class="form-section-title">📎 Checklist de Documentos Generales</div>
+            <p style="font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.5);margin-bottom:20px">Marca los documentos que ya tienes disponibles del cliente.</p>
+            <div class="checklist-grid" id="checklist-general">
+              <!-- Se llena dinámicamente -->
+            </div>
+          </div>
+
+          <div class="form-card">
+            <div class="form-section-title">📦 Documentos Adicionales por Producto</div>
+            <div style="font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.5);margin-bottom:20px">
+              Según el destino del crédito seleccionado, estos documentos pueden ser requeridos por algunas financieras.
+            </div>
+            <div class="checklist-grid" id="checklist-adicional"></div>
+          </div>
+
+          <div class="step-actions">
+            <button class="btn-outline" onclick="goStep(1)">← Atrás</button>
+            <button class="btn-gold" onclick="goStep(3)">Siguiente: CIEC & FSM →</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: CIEC -->
+        <div class="step-form" id="step-3">
+          <div class="form-card">
+            <div class="form-section-title">🔐 Contraseña CIEC del Cliente</div>
+            <div style="background:rgba(196,161,92,.06);border:1px solid rgba(196,161,92,.15);border-radius:10px;padding:16px;margin-bottom:20px;font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.7);line-height:1.7">
+              ⚠️ La CIEC es la contraseña del SAT del cliente. Se utiliza exclusivamente para descargar información fiscal y generar el Reporte Financiero FSM. Esta información es confidencial y no se almacena.
+            </div>
+            <div class="grid2">
+              <div class="form-group">
+                <label class="lbl">RFC del Cliente</label>
+                <input class="inp" id="ciec_rfc" placeholder="Se llena automáticamente" readonly style="opacity:.6" />
+              </div>
+              <div class="form-group">
+                <label class="lbl">Contraseña CIEC</label>
+                <input class="inp" type="password" id="ciec_password" placeholder="Contraseña SAT del cliente" />
+              </div>
+            </div>
+            <div style="height:1px;background:rgba(196,161,92,.1);margin:20px 0"></div>
+            <div style="font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.6);margin-bottom:14px">
+              ¿El cliente no te ha proporcionado la CIEC? Comparte este enlace para que la ingrese directamente:
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <input class="inp" id="ciec-link" readonly style="opacity:.6;font-size:12px" />
+              <button class="btn-gold" style="white-space:nowrap;padding:10px 16px;font-size:11px" onclick="copiarLink()">📋 Copiar</button>
+            </div>
+          </div>
+
+          <div class="form-card">
+            <div class="form-section-title">📊 Información Financiera Adicional</div>
+            <div class="grid2">
+              <div class="form-group"><label class="lbl">Total Activos (MXN)</label><input class="inp" type="number" id="nc_activos" placeholder="Ej. 5000000" /></div>
+              <div class="form-group"><label class="lbl">Total Pasivos (MXN)</label><input class="inp" type="number" id="nc_pasivos" placeholder="Ej. 2000000" /></div>
+              <div class="form-group"><label class="lbl">Capital Contable (MXN)</label><input class="inp" type="number" id="nc_capital" placeholder="Ej. 3000000" /></div>
+              <div class="form-group"><label class="lbl">Utilidad Neta Anual (MXN)</label><input class="inp" type="number" id="nc_utilidad" placeholder="Ej. 450000" /></div>
+              <div class="form-group"><label class="lbl">Promedio Bancario Mensual (MXN)</label><input class="inp" type="number" id="nc_bancario" placeholder="Ej. 920000" /></div>
+              <div class="form-group"><label class="lbl">Capacidad de Pago Mensual (MXN)</label><input class="inp" type="number" id="nc_capacidad" placeholder="Ej. 85000" /></div>
+              <div class="form-group"><label class="lbl">Historial Crediticio</label>
+                <select class="inp" id="nc_historial">
+                  <option value="">Seleccionar...</option>
+                  <option value="positivo">Positivo — sin manchas</option>
+                  <option value="regular">Regular — incidencias resueltas</option>
+                  <option value="negativo">Negativo — incidencias activas</option>
+                  <option value="sin_historial">Sin historial</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="lbl">Garantía Disponible</label>
+                <select class="inp" id="nc_garantia">
+                  <option value="">Seleccionar...</option>
+                  <option value="inmueble_libre">Inmueble libre de gravamen</option>
+                  <option value="inmueble_hipotecado">Inmueble con hipoteca parcial</option>
+                  <option value="aval">Solo aval</option>
+                  <option value="prendaria">Garantía prendaria</option>
+                  <option value="sin_garantia">Sin garantía</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div style="text-align:center;margin-bottom:20px">
+            <button class="btn-gold" style="padding:14px 40px;font-size:13px" onclick="generarReporteFSM()">
+              🧠 Generar Reporte Financiero FSM
+            </button>
+            <div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.35);margin-top:8px">
+              El análisis puede tardar unos segundos
+            </div>
+          </div>
+
+          <div id="reporte-preview" style="display:none">
+            <!-- Score preview -->
+          </div>
+
+          <div class="step-actions">
+            <button class="btn-outline" onclick="goStep(2)">← Atrás</button>
+            <button class="btn-gold" onclick="goStep(4)">Siguiente: Financieras →</button>
+          </div>
+        </div>
+
+        <!-- STEP 4: FINANCIERAS -->
+        <div class="step-form" id="step-4">
+          <div class="form-card">
+            <div class="form-section-title">🏦 Selección de Financieras</div>
+            <div style="font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.55);margin-bottom:20px;line-height:1.7">
+              Selecciona las financieras a las que deseas enviar el expediente, o usa la <strong style="color:var(--gold)">Opción FSM</strong> para que el sistema seleccione automáticamente las mejores opciones según el perfil del cliente.
+            </div>
+            <button class="btn-gold" style="width:100%;padding:16px;font-size:13px;margin-bottom:20px" onclick="opcionFSM()">
+              ⚡ Opción FSM — Selección Automática Inteligente
+            </button>
+            <div id="financieras-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <!-- Se llena dinámicamente -->
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button class="btn-outline" onclick="goStep(3)">← Atrás</button>
+            <button class="btn-gold" onclick="guardarCaso()" style="background:linear-gradient(135deg,#4ade80,#22c55e);color:#080d1a">
+              ✅ Guardar y Enviar Caso
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CRM -->
+      <div id="view-crm" class="view">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+          <div style="font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold)">Todos mis casos</div>
+          <div style="display:flex;gap:8px">
+            <input class="inp" style="width:220px;padding:8px 14px;font-size:12px" placeholder="🔍 Buscar empresa..." id="search-crm" oninput="filterCRM()" />
+          </div>
+        </div>
+        <div id="crm-table">
+          <div style="text-align:center;padding:60px;font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(232,223,200,.3)">
+            No tienes casos registrados aún.<br>¡Agrega tu primer caso!
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORTE FSM -->
+      <div id="view-reporte" class="view">
+        <div style="text-align:center;padding:40px 0">
+          <div style="font-size:48px;margin-bottom:16px">🧾</div>
+          <h2 style="font-size:28px;font-weight:300;margin-bottom:12px">Reporte Financiero <em style="color:var(--gold)">FSM</em></h2>
+          <p style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(232,223,200,.5);margin-bottom:32px">Genera un diagnóstico financiero institucional completo para tu cliente</p>
+          <a href="reporte.html" target="_blank" class="btn-gold" style="text-decoration:none;padding:14px 40px;font-size:13px">
+            Abrir FinBroker MX →
+          </a>
+        </div>
+      </div>
+
+      <!-- COMISIONES -->
+      <div id="view-comisiones" class="view">
+        <div class="form-card">
+          <div class="form-section-title">💰 Tabulador de Comisiones FSM</div>
+          <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;font-family:'Montserrat',sans-serif;font-size:12px">
+              <thead>
+                <tr style="border-bottom:1px solid rgba(196,161,92,.15)">
+                  <th style="text-align:left;padding:10px 14px;color:var(--gold);font-size:10px;letter-spacing:.1em;text-transform:uppercase">Producto</th>
+                  <th style="text-align:center;padding:10px 14px;color:var(--gold);font-size:10px;letter-spacing:.1em;text-transform:uppercase">Comisión Broker</th>
+                  <th style="text-align:center;padding:10px 14px;color:var(--gold);font-size:10px;letter-spacing:.1em;text-transform:uppercase">Monto Mín.</th>
+                  <th style="text-align:center;padding:10px 14px;color:var(--gold);font-size:10px;letter-spacing:.1em;text-transform:uppercase">Monto Máx.</th>
+                  <th style="text-align:center;padding:10px 14px;color:var(--gold);font-size:10px;letter-spacing:.1em;text-transform:uppercase">Tiempo Est.</th>
+                </tr>
+              </thead>
+              <tbody id="comisiones-table">
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <div class="form-section-title">🧮 Calculadora de Comisión</div>
+          <div class="grid2">
+            <div class="form-group"><label class="lbl">Monto del Crédito (MXN)</label><input class="inp" type="number" id="calc-monto" placeholder="Ej. 1500000" oninput="calcComision()" /></div>
+            <div class="form-group"><label class="lbl">Producto</label>
+              <select class="inp" id="calc-producto" onchange="calcComision()">
+                <option value="">Seleccionar...</option>
+                <option value="0.8">Factoraje (0.8%)</option>
+                <option value="1.0">Línea Revolvente (1.0%)</option>
+                <option value="1.2">Crédito Simple (1.2%)</option>
+                <option value="1.0">Arrendamiento (1.0%)</option>
+                <option value="1.0">Sale & Leaseback (1.0%)</option>
+                <option value="0.8">Anticipo TPV (0.8%)</option>
+                <option value="1.2">Crédito Puente (1.2%)</option>
+              </select>
+            </div>
+          </div>
+          <div id="calc-result" style="display:none;background:rgba(196,161,92,.06);border:1px solid rgba(196,161,92,.2);border-radius:10px;padding:20px;text-align:center;margin-top:16px">
+            <div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.5);margin-bottom:6px">Tu comisión estimada</div>
+            <div style="font-size:36px;font-weight:300;color:var(--gold)" id="calc-total">$0</div>
+            <div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.4);margin-top:4px" id="calc-detalle"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAPACITACIONES -->
+      <div id="view-capacitaciones" class="view">
+        <div class="form-card">
+          <div class="form-section-title">📚 Biblioteca de Capacitaciones</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+            <div style="background:rgba(255,255,255,.02);border:1px solid rgba(196,161,92,.1);border-radius:12px;padding:20px">
+              <div style="font-size:28px;margin-bottom:10px">📄</div>
+              <div style="font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px;margin-bottom:6px">Factoraje Financiero</div>
+              <div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.5);margin-bottom:14px">Requisitos, proceso y tips de presentación</div>
+              <span style="display:inline-block;padding:3px 10px;background:rgba(74,222,128,.1);color:#4ade80;border-radius:4px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600">Disponible</span>
+            </div>
+            <div style="background:rgba(255,255,255,.02);border:1px solid rgba(196,161,92,.1);border-radius:12px;padding:20px">
+              <div style="font-size:28px;margin-bottom:10px">💼</div>
+              <div style="font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px;margin-bottom:6px">Crédito Simple</div>
+              <div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.5);margin-bottom:14px">Cómo estructurar el expediente ideal</div>
+              <span style="display:inline-block;padding:3px 10px;background:rgba(74,222,128,.1);color:#4ade80;border-radius:4px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600">Disponible</span>
+            </div>
+            <div style="background:rgba(255,255,255,.02);border:1px solid rgba(196,161,92,.1);border-radius:12px;padding:20px">
+              <div style="font-size:28px;margin-bottom:10px">🔃</div>
+              <div style="font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px;margin-bottom:6px">Sale & Leaseback</div>
+              <div style="font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(232,223,200,.5);margin-bottom:14px">El producto más sofisticado explicado</div>
+              <span style="display:inline-block;padding:3px 10px;background:rgba(250,204,21,.1);color:#facc15;border-radius:4px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600">Próximamente</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEMBRESÍA -->
+      <div id="view-membresia" class="view">
+        <div class="form-card" style="text-align:center;max-width:500px;margin:0 auto">
+          <div style="font-size:48px;margin-bottom:16px">⭐</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:11px;color:var(--gold);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px">Estado de Membresía</div>
+          <div style="font-size:32px;font-weight:300;color:#4ade80;margin-bottom:4px">Activa</div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.5);margin-bottom:32px">Plan Broker FSM — $300 MXN/mes</div>
+          <div style="height:1px;background:rgba(196,161,92,.1);margin-bottom:24px"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left;margin-bottom:24px">
+            <div style="font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.7)">✅ 5 Reportes FSM/mes</div>
+            <div style="font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.7)">✅ CRM de casos</div>
+            <div style="font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.7)">✅ Tabulador de comisiones</div>
+            <div style="font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.7)">✅ Biblioteca de capacitaciones</div>
+            <div style="font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.7)">✅ Checklists por producto</div>
+            <div style="font-family:'Montserrat',sans-serif;font-size:12px;color:rgba(232,223,200,.7)">✅ Soporte WhatsApp</div>
+          </div>
+          <a href="https://wa.me/529611717870" target="_blank" class="btn-gold" style="text-decoration:none;display:inline-block">Contactar a FSM →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // VERIFICAR SESIÓN
+    var session = sessionStorage.getItem('fsm_user');
+    if (!session) { window.location.href = 'brokers.html'; }
+    var user = JSON.parse(session);
+    document.getElementById('user-name').textContent = user.nombre || 'Broker';
+    document.getElementById('user-rol').textContent = user.rol === 'admin' ? 'Administrador' : 'Broker Afiliado';
+    document.getElementById('user-avatar').textContent = (user.nombre || 'B')[0].toUpperCase();
+
+    // CASOS
+    var casos = JSON.parse(localStorage.getItem('fsm_casos') || '[]');
+    var currentStep = 1;
+
+    function saveCasos() { localStorage.setItem('fsm_casos', JSON.stringify(casos)); }
+
+    // NAVEGACIÓN
+    function showView(view) {
+      document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+      document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+      document.getElementById('view-' + view).classList.add('active');
+      var titles = {
+        'dashboard': 'Dashboard <span>FSM</span>',
+        'nuevo-caso': 'Nuevo <span>Caso</span>',
+        'crm': 'Mis <span>Casos</span>',
+        'reporte': 'Reporte <span>FSM</span>',
+        'comisiones': 'Tabulador de <span>Comisiones</span>',
+        'capacitaciones': '<span>Capacitaciones</span>',
+        'membresia': 'Mi <span>Membresía</span>'
+      };
+      document.getElementById('page-title').innerHTML = titles[view] || view;
+      if (view === 'dashboard') updateDashboard();
+      if (view === 'crm') renderCRM();
+      if (view === 'comisiones') renderComisiones();
+      if (view === 'nuevo-caso') { currentStep = 1; goStep(1); initNuevoCaso(); }
+    }
+
+    // STEPS
+    function goStep(n) {
+      currentStep = n;
+      document.querySelectorAll('.step-form').forEach(function(s) { s.classList.remove('active'); });
+      document.querySelectorAll('.step-btn').forEach(function(b, i) {
+        b.classList.remove('active');
+        if (i + 1 < n) b.classList.add('done');
+        else b.classList.remove('done');
+      });
+      document.getElementById('step-' + n).classList.add('active');
+      document.getElementById('step-btn-' + n).classList.add('active');
+      if (n === 3) {
+        document.getElementById('ciec_rfc').value = document.getElementById('nc_rfc').value;
+        var token = Math.random().toString(36).substr(2, 8).toUpperCase();
+        document.getElementById('ciec-link').value = 'fsmglobaladvisory.com/ciec?token=' + token + '&rfc=' + document.getElementById('nc_rfc').value;
+      }
+      if (n === 4) renderFinancieras();
+      window.scrollTo(0, 0);
+    }
+
+    function initNuevoCaso() {
+      renderChecklist();
+      renderFinancieras();
+    }
+
+    // CHECKLIST
+    var docsGenerales = [
+      'Acta Constitutiva y Poderes Notariales',
+      'Identificación oficial del representante legal',
+      'Comprobante de domicilio fiscal',
+      'Estados de cuenta bancarios (12 meses)',
+      'Declaraciones anuales ISR (2 años)',
+      'Estados financieros con relaciones analíticas',
+      'Opinión de cumplimiento SAT (32-D)',
+      'CÉDULA de identificación fiscal',
+      'Alta en el SAT (constancia RFC)',
+      'Currículum empresarial / Presentación',
+    ];
+
+    function renderChecklist() {
+      var grid = document.getElementById('checklist-general');
+      grid.innerHTML = docsGenerales.map(function(doc, i) {
+        return '<div class="check-item" onclick="toggleCheck(this)" data-doc="' + doc + '">' +
+          '<div class="check-box">✓</div>' +
+          '<div class="check-label">' + doc + '</div>' +
+          '</div>';
+      }).join('');
+
+      var destino = document.getElementById('nc_destino') ? document.getElementById('nc_destino').value : '';
+      var adicionales = [];
+      if (destino === 'equipo') adicionales = ['Facturas de activos a financiar', 'Cotización del proveedor'];
+      if (destino === 'inmueble') adicionales = ['Escrituras del inmueble', 'Avalúo reciente', 'Boleta predial'];
+      if (destino === 'refinanciamiento') adicionales = ['Estados de cuenta de créditos actuales', 'Tabla de amortización vigente'];
+      var grid2 = document.getElementById('checklist-adicional');
+      grid2.innerHTML = adicionales.length ? adicionales.map(function(doc) {
+        return '<div class="check-item" onclick="toggleCheck(this)">' +
+          '<div class="check-box">✓</div>' +
+          '<div class="check-label">' + doc + '</div>' +
+          '</div>';
+      }).join('') : '<div style="font-family:\'Montserrat\',sans-serif;font-size:12px;color:rgba(232,223,200,.35);padding:16px">No hay documentos adicionales específicos para el destino seleccionado.</div>';
+    }
+
+    function toggleCheck(el) {
+      el.classList.toggle('checked');
+    }
+
+    // FINANCIERAS
+    var FINANCIERAS = [
+      { id: 'f1', nombre: 'Financiera 1', productos: ['Crédito Simple', 'Línea Revolvente'], minMonto: 500000 },
+      { id: 'f2', nombre: 'Financiera 2', productos: ['Factoraje', 'Línea Revolvente'], minMonto: 200000 },
+      { id: 'f3', nombre: 'Financiera 3', productos: ['Arrendamiento', 'Sale & Leaseback'], minMonto: 1000000 },
+      { id: 'f4', nombre: 'Financiera 4', productos: ['Crédito Simple', 'Crédito Puente'], minMonto: 2000000 },
+      { id: 'f5', nombre: 'Financiera 5', productos: ['Anticipo TPV', 'Línea Revolvente'], minMonto: 150000 },
+      { id: 'f6', nombre: 'Financiera 6', productos: ['Crédito Simple', 'Factoraje'], minMonto: 300000 },
+    ];
+
+    function renderFinancieras() {
+      var grid = document.getElementById('financieras-grid');
+      grid.innerHTML = FINANCIERAS.map(function(f) {
+        return '<div class="check-item" onclick="toggleCheck(this)" data-fin="' + f.id + '">' +
+          '<div class="check-box">✓</div>' +
+          '<div>' +
+          '<div class="check-label" style="font-weight:600;font-size:12px">' + f.nombre + '</div>' +
+          '<div class="check-label">' + f.productos.join(' · ') + '</div>' +
+          '</div></div>';
+      }).join('');
+    }
+
+    function opcionFSM() {
+      document.querySelectorAll('#financieras-grid .check-item').forEach(function(el) {
+        el.classList.add('checked');
+      });
+      alert('✅ Opción FSM activada — Se enviarán a todas las financieras candidatas según el perfil del cliente.');
+    }
+
+    // LINK CIEC
+    function copiarLink() {
+      var link = document.getElementById('ciec-link').value;
+      navigator.clipboard.writeText(link).then(function() {
+        alert('✅ Enlace copiado al portapapeles');
+      });
+    }
+
+    // REPORTE FSM
+    function generarReporteFSM() {
+      var score = Math.min(95, Math.max(30,
+        (document.getElementById('nc_historial').value === 'positivo' ? 20 : 10) +
+        (document.getElementById('nc_garantia').value && document.getElementById('nc_garantia').value.includes('inmueble_libre') ? 20 : 10) +
+        (+document.getElementById('nc_antiguedad').value >= 3 ? 15 : 8) +
+        20
+      ));
+      var scoreColor = score >= 70 ? '#4ade80' : score >= 50 ? '#facc15' : '#f87171';
+      var preview = document.getElementById('reporte-preview');
+      preview.style.display = 'block';
+      preview.innerHTML = '<div style="background:rgba(255,255,255,.025);border:1px solid rgba(196,161,92,.15);border-radius:14px;padding:24px;margin-bottom:20px">' +
+        '<div style="display:flex;align-items:center;gap:24px">' +
+        '<div style="text-align:center">' +
+        '<svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="33" fill="none" stroke="rgba(196,161,92,.1)" stroke-width="6"/>' +
+        '<circle cx="40" cy="40" r="33" fill="none" stroke="' + scoreColor + '" stroke-width="6" stroke-dasharray="' + 2*Math.PI*33 + '" stroke-dashoffset="' + 2*Math.PI*33*(1-score/100) + '" stroke-linecap="round" transform="rotate(-90 40 40)"/>' +
+        '<text x="40" y="44" text-anchor="middle" fill="' + scoreColor + '" font-size="18" font-weight="700" font-family="Montserrat">' + score + '</text></svg>' +
+        '<div style="font-family:Montserrat,sans-serif;font-size:11px;color:' + scoreColor + ';font-weight:600">Score FSM</div>' +
+        '</div>' +
+        '<div><div style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:600;margin-bottom:6px">' + (document.getElementById('nc_nombre_comercial').value || 'Empresa') + '</div>' +
+        '<div style="font-family:Montserrat,sans-serif;font-size:12px;color:rgba(232,223,200,.6)">Reporte generado — Score ' + score + '/100</div>' +
+        '<div style="font-family:Montserrat,sans-serif;font-size:11px;color:var(--gold);margin-top:8px">' + (score >= 70 ? '✅ Perfil favorable para colocación' : score >= 50 ? '⚠️ Perfil con áreas de mejora' : '❌ Requiere estructuración adicional') + '</div>' +
+        '</div></div></div>';
+    }
+
+    // GUARDAR CASO
+    function guardarCaso() {
+      var financierasSeleccionadas = [];
+      document.querySelectorAll('#financieras-grid .check-item.checked').forEach(function(el) {
+        financierasSeleccionadas.push(el.querySelector('.check-label').textContent);
+      });
+      var caso = {
+        id: Date.now(),
+        empresa: document.getElementById('nc_nombre_comercial').value || 'Sin nombre',
+        razonSocial: document.getElementById('nc_razon_social').value,
+        rfc: document.getElementById('nc_rfc').value,
+        monto: document.getElementById('nc_monto').value,
+        destino: document.getElementById('nc_destino').value,
+        ventas: document.getElementById('nc_ventas').value,
+        giro: document.getElementById('nc_giro').value,
+        antiguedad: document.getElementById('nc_antiguedad').value,
+        ubicacion: document.getElementById('nc_ubicacion').value,
+        financieras: financierasSeleccionadas,
+        status: 'nuevo',
+        fecha: new Date().toLocaleDateString('es-MX'),
+        notas: document.getElementById('nc_notas').value,
+      };
+      casos.push(caso);
+      saveCasos();
+      alert('✅ Caso guardado correctamente. Puedes verlo en "Mis Casos".');
+      showView('crm');
+    }
+
+    // RENDER CRM
+    function renderCRM() {
+      var query = (document.getElementById('search-crm') ? document.getElementById('search-crm').value : '').toLowerCase();
+      var filtered = casos.filter(function(c) { return c.empresa.toLowerCase().includes(query); });
+      var container = document.getElementById('crm-table');
+      if (!filtered.length) {
+        container.innerHTML = '<div style="text-align:center;padding:60px;font-family:Montserrat,sans-serif;font-size:13px;color:rgba(232,223,200,.3)">No hay casos registrados.</div>';
+        return;
+      }
+      var statusColors = { nuevo: '#c4a15c', en_proceso: '#a78bfa', propuesta: '#facc15', aprobado: '#4ade80', rechazado: '#f87171', cerrado: '#4ade80' };
+      var statusLabels = { nuevo: 'Nuevo', en_proceso: 'En Proceso', propuesta: 'Propuesta', aprobado: 'Aprobado', rechazado: 'Rechazado', cerrado: 'Cerrado' };
+      container.innerHTML = '<table style="width:100%;border-collapse:collapse;font-family:Montserrat,sans-serif;font-size:12px">' +
+        '<thead><tr style="border-bottom:1px solid rgba(196,161,92,.12)">' +
+        '<th style="text-align:left;padding:10px 14px;color:var(--gold);font-size:10px;letter-spacing:.1em;text-transform:uppercase">Empresa</th>' +
+        '<th style="text-align:left;padding:10px 14px;color:var(--gold);font-size:10px;letter-spacing:.1em;text-transform:uppercase">Monto</th>' +
+        '<th style="text-align:left;padding:10px 14px;color:var(--gold);font-size:10px;letter-spacing:.1em;text-transform:uppercase">Destino</th>' +
+        '<th style="text-align:center;padding:10px 14px;color:var(--gold);font-size:10px;letter-spacing:.1em;text-transform:uppercase">Estatus</th>' +
+        '<th style="text-align:center;padding:10px 14px;color:var(--gold);font-size:10px;letter-spacing:.1em;text-transform:uppercase">Fecha</th>' +
+        '<th style="text-align:center;padding:10px 14px;color:var(--gold);font-size:10px;letter-spacing:.1em;text-transform:uppercase">Acción</th>' +
+        '</tr></thead><tbody>' +
+        filtered.map(function(c) {
+          var color = statusColors[c.status] || '#c4a15c';
+          return '<tr style="border-bottom:1px solid rgba(196,161,92,.06);transition:background .2s" onmouseover="this.style.background=\'rgba(196,161,92,.03)\'" onmouseout="this.style.background=\'transparent\'">' +
+            '<td style="padding:12px 14px"><div style="font-weight:600">' + c.empresa + '</div><div style="font-size:10px;color:rgba(232,223,200,.4)">' + c.giro + '</div></td>' +
+            '<td style="padding:12px 14px;color:var(--gold)">$' + Number(c.monto).toLocaleString() + '</td>' +
+            '<td style="padding:12px 14px;color:rgba(232,223,200,.6)">' + (c.destino || '—') + '</td>' +
+            '<td style="padding:12px 14px;text-align:center"><select onchange="updateStatus(' + c.id + ', this.value)" style="background:rgba(' + hexToRgb(color) + ',.1);color:' + color + ';border:1px solid rgba(' + hexToRgb(color) + ',.3);border-radius:6px;padding:4px 8px;font-family:Montserrat,sans-serif;font-size:10px;font-weight:600;outline:none;cursor:pointer">' +
+            Object.keys(statusLabels).map(function(k) { return '<option value="' + k + '" ' + (c.status === k ? 'selected' : '') + ' style="background:#0d1425;color:#e8dfc8">' + statusLabels[k] + '</option>'; }).join('') +
+            '</select></td>' +
+            '<td style="padding:12px 14px;text-align:center;color:rgba(232,223,200,.4)">' + c.fecha + '</td>' +
+            '<td style="padding:12px 14px;text-align:center"><button onclick="deleteCaso(' + c.id + ')" style="background:transparent;border:none;color:rgba(248,113,113,.5);cursor:pointer;font-size:14px" title="Eliminar">🗑️</button></td>' +
+            '</tr>';
+        }).join('') + '</tbody></table>';
+    }
+
+    function hexToRgb(hex) {
+      var map = { '#c4a15c':'196,161,92', '#a78bfa':'167,139,250', '#facc15':'250,204,21', '#4ade80':'74,222,128', '#f87171':'248,113,113' };
+      return map[hex] || '196,161,92';
+    }
+
+    function updateStatus(id, status) {
+      casos = casos.map(function(c) { return c.id === id ? Object.assign({}, c, {status: status}) : c; });
+      saveCasos();
+      updateDashboard();
+    }
+
+    function deleteCaso(id) {
+      if (!confirm('¿Eliminar este caso?')) return;
+      casos = casos.filter(function(c) { return c.id !== id; });
+      saveCasos();
+      renderCRM();
+      updateDashboard();
+    }
+
+    function filterCRM() { renderCRM(); }
+
+    // DASHBOARD
+    function updateDashboard() {
+      document.getElementById('stat-total').textContent = casos.length;
+      document.getElementById('stat-proceso').textContent = casos.filter(function(c) { return c.status === 'en_proceso' || c.status === 'propuesta'; }).length;
+      document.getElementById('stat-cerrados').textContent = casos.filter(function(c) { return c.status === 'cerrado' || c.status === 'aprobado'; }).length;
+      var totalMonto = casos.reduce(function(sum, c) { return sum + (Number(c.monto) * 0.01 || 0); }, 0);
+      document.getElementById('stat-comision').textContent = '$' + Math.round(totalMonto).toLocaleString();
+      document.getElementById('casos-badge').textContent = casos.length;
+
+      var statuses = [
+        { key: 'nuevo', label: 'Nuevos', color: '#c4a15c' },
+        { key: 'en_proceso', label: 'En Proceso', color: '#a78bfa' },
+        { key: 'propuesta', label: 'Propuesta', color: '#facc15' },
+        { key: 'aprobado', label: 'Aprobados', color: '#4ade80' },
+        { key: 'cerrado', label: 'Cerrados', color: '#22c55e' },
+      ];
+
+      var board = document.getElementById('pipeline-board');
+      board.innerHTML = statuses.map(function(s) {
+        var cols = casos.filter(function(c) { return c.status === s.key; });
+        return '<div class="pipeline-col">' +
+          '<div class="pipeline-header">' +
+          '<div class="pipeline-title" style="color:' + s.color + '">' + s.label + '</div>' +
+          '<div class="pipeline-count">' + cols.length + '</div>' +
+          '</div>' +
+          (cols.length ? cols.map(function(c) {
+            return '<div class="caso-card" onclick="showView(\'crm\')">' +
+              '<div class="caso-empresa">' + c.empresa + '</div>' +
+              '<div class="caso-monto">$' + Number(c.monto).toLocaleString() + ' MXN</div>' +
+              '<div class="caso-meta"><span class="caso-fecha">' + c.fecha + '</span></div>' +
+              '</div>';
+          }).join('') : '<div class="empty-col">Sin casos<br>en esta etapa</div>') +
+          '</div>';
+      }).join('');
+    }
+
+    // COMISIONES
+    var COMISIONES_DATA = [
+      { producto: 'Factoraje Financiero', comision: '0.8%', min: '$200K', max: '$100 MDP', tiempo: '5-10 días' },
+      { producto: 'Línea Revolvente', comision: '1.0%', min: '$500K', max: '$50 MDP', tiempo: '10-15 días' },
+      { producto: 'Crédito Simple', comision: '1.2%', min: '$300K', max: '$300 MDP', tiempo: '15-25 días' },
+      { producto: 'Arrendamiento', comision: '1.0%', min: '$300K', max: 'Sin límite', tiempo: '10-20 días' },
+      { producto: 'Sale & Leaseback', comision: '1.0%', min: '$500K', max: '$35 MDP', tiempo: '15-20 días' },
+      { producto: 'Anticipo TPV', comision: '0.8%', min: '$150K', max: '2 meses TPV', tiempo: '3-7 días' },
+      { producto: 'Crédito Puente', comision: '1.2%', min: '$2 MDP', max: '$100 MDP', tiempo: '20-30 días' },
+    ];
+
+    function renderComisiones() {
+      var tbody = document.getElementById('comisiones-table');
+      tbody.innerHTML = COMISIONES_DATA.map(function(r) {
+        return '<tr style="border-bottom:1px solid rgba(196,161,92,.06)">' +
+          '<td style="padding:12px 14px">' + r.producto + '</td>' +
+          '<td style="padding:12px 14px;text-align:center;color:var(--gold);font-weight:600">' + r.comision + '</td>' +
+          '<td style="padding:12px 14px;text-align:center;color:rgba(232,223,200,.6)">' + r.min + '</td>' +
+          '<td style="padding:12px 14px;text-align:center;color:rgba(232,223,200,.6)">' + r.max + '</td>' +
+          '<td style="padding:12px 14px;text-align:center;color:rgba(232,223,200,.6)">' + r.tiempo + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    function calcComision() {
+      var monto = +document.getElementById('calc-monto').value;
+      var pct = +document.getElementById('calc-producto').value;
+      if (!monto || !pct) { document.getElementById('calc-result').style.display = 'none'; return; }
+      var total = monto * pct / 100;
+      document.getElementById('calc-result').style.display = 'block';
+      document.getElementById('calc-total').textContent = '$' + Math.round(total).toLocaleString() + ' MXN';
+      document.getElementById('calc-detalle').textContent = '$' + Number(monto).toLocaleString() + ' × ' + pct + '% comisión';
+    }
+
+    // LOGOUT
+    function logout() {
+      if (confirm('¿Cerrar sesión?')) {
+        sessionStorage.removeItem('fsm_user');
+        window.location.href = 'brokers.html';
+      }
+    }
+
+    // INIT
+    updateDashboard();
+  </script>
+
+</body>
+</html>
